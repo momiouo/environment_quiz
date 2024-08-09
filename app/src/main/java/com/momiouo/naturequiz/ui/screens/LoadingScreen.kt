@@ -24,7 +24,17 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun LoadingScreen() {
+fun LoadingScreen(
+    navigateToMenuScreen: () -> Unit
+) {
+    val loadingScreenDelay = 3_000L
+
+    //Maybe not the best way to navigate ... should be controlled by a val in viewModel...
+    LaunchedEffect(Unit) {
+        delay(loadingScreenDelay)
+        navigateToMenuScreen()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -70,7 +80,7 @@ fun LogoWithSpinAnimation() {
             contentDescription = "",
             modifier = Modifier
                 .graphicsLayer {
-                    rotationY = rotation
+                    rotationZ = rotation
                 },
             contentScale = ContentScale.Fit,
         )
@@ -105,5 +115,5 @@ fun FlowerImage(modifier: Modifier) {
 @Preview
 @Composable
 private fun LoadingScreenPreview() {
-    LoadingScreen()
+    LoadingScreen(navigateToMenuScreen = {})
 }

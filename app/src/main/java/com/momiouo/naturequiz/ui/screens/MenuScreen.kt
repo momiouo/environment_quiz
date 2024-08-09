@@ -1,7 +1,6 @@
 package com.momiouo.naturequiz.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import fr.momiouo.naturequiz.R
 
 @Composable
-fun MenuScreen() {
+fun MenuScreen(navigateToLevelScreen: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -51,7 +50,7 @@ fun MenuScreenContent() {
                 textAlign = TextAlign.Center,
                 color = Color.White,
                 modifier = Modifier
-                    .padding(top = 20.dp, start = 10.dp, end = 10.dp)
+                    .padding(top = 20.dp, bottom = 20.dp)
             )
         }
 
@@ -129,5 +128,5 @@ data class ButtonTheme(
 @Preview
 @Composable
 fun MenuScreenPreview() {
-    MenuScreen()
+    MenuScreen { }
 }
