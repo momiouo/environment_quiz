@@ -30,19 +30,25 @@ import fr.momiouo.naturequiz.R
 
 
 @Composable
-fun LevelScreen(themeId: String?) {
+fun LevelScreen(
+    themeId: String?,
+    navigateToQuestion: (String, String) -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         BackgroundImageMenu() //TODO write this in common
-        LevelScreenContent()
+        LevelScreenContent(themeId, navigateToQuestion)
         BackButton(modifier = Modifier.align(Alignment.BottomEnd))
         FlowerWaterDeco(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
 @Composable
-fun LevelScreenContent() {
+fun LevelScreenContent(
+    themeId: String?,
+    navigateToQuestion: (String, String) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +66,11 @@ fun LevelScreenContent() {
         )
 
         Button(
-            onClick = { /* Handle button click */ },
+            onClick = {
+                if (themeId != null) {
+                    navigateToQuestion(themeId,"1")
+                }
+            },
             modifier = Modifier
                 .width(275.dp)
                 .height(IntrinsicSize.Min)
@@ -109,5 +119,5 @@ fun FlowerWaterDeco(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun PreviewThemeActivity() {
-    LevelScreen(themeId)
+    LevelScreen("") { _, _ -> }
 }

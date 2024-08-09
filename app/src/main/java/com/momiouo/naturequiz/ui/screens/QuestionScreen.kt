@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import fr.momiouo.naturequiz.R
 
 @Composable
-fun QuestionScreen(modifier: Modifier = Modifier) {
+fun QuestionScreen(themeId: String?, levelId: String?) {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -140,5 +140,5 @@ fun HintButton(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun QuestionScreenPreview() {
-    QuestionScreen()
+    QuestionScreen("", "")
 }

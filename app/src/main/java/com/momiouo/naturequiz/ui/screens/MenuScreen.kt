@@ -30,12 +30,14 @@ fun MenuScreen(navigateToLevelScreen: (String) -> Unit) {
         modifier = Modifier.fillMaxSize()
     ) {
         BackgroundImageMenu() //TODO write this in common
-        MenuScreenContent()
+        MenuScreenContent(navigateToLevelScreen)
     }
 }
 
 @Composable
-fun MenuScreenContent() {
+fun MenuScreenContent(
+    navigateToLevelScreen: (String) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -67,7 +69,9 @@ fun MenuScreenContent() {
             )
         ) { btnObj ->
             Box(modifier = Modifier
-                .clickable { }
+                .clickable {
+                    navigateToLevelScreen(btnObj.text)
+                }
                 .fillMaxWidth(.95f)
                 .height(200.dp)
             ) {

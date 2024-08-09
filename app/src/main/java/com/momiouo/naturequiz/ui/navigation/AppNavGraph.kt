@@ -30,22 +30,40 @@ fun AppNavHost() {
 
         composable(Screen.MenuScreen.route) {
             MenuScreen(
-                navigateToLevelScreen = { navController.navigate(Screen.LevelScreen.route) }
+                navigateToLevelScreen = { themeId -> navController.navigate(Screen.LevelScreen.route + "/$themeId") }
             )
         }
 
         composable(
-            route = Screen.LevelScreen.route + "{themeId}",
+            route = Screen.LevelScreen.route + "/{themeId}",
             arguments = listOf(navArgument("themeId") {
                 type = NavType.StringType
             })
         ) { backStackEntry ->
             val themeId = backStackEntry.arguments?.getString("themeId")
-            LevelScreen(themeId)
+            LevelScreen(
+                themeId = themeId,
+                navigateToQuestion = { themeId, levelId ->
+                    navController.navigate(Screen.QuestionScreen.route + "/$themeId&$levelId")
+                }
+            )
         }
 
-        composable(Screen.QuestionScreen.route) {
-            QuestionScreen()
+        composable(
+            route = Screen.QuestionScreen.route + "/{themeId}&{levelId}",
+            arguments = listOf(navArgument(
+                "themeId"
+            ) {
+                type = NavType.StringType
+            }, navArgument(
+                "levelId"
+            ) {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            val themeId = backStackEntry.arguments?.getString("themeId")
+            val levelId = backStackEntry.arguments?.getString("levelId")
+            QuestionScreen(themeId, levelId)
         }
     }
 }
