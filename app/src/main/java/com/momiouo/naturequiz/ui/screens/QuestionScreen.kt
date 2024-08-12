@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,29 +22,49 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.momiouo.naturequiz.R
 
 @Composable
-fun QuestionScreen(themeId: String?, levelId: String?) {
+fun QuestionScreen(
+    themeId: String?,
+    levelId: String?,
+    questionViewModel: QuestionViewModel = hiltViewModel()
+) {
+
+    val questionUiState by questionViewModel.questionUiState.collectAsStateWithLifecycle()
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
         BackgroundImageMenu() //TODO write this in common
-        InGameScreenContent()
+        when (val question = questionUiState) {
+            is QuestionUiState.Loaded -> InGameScreenContent(
+                themeId,
+                question.questionsList?.first()
+            )
+
+            QuestionUiState.Loading -> Text(text = "Loading...")
+        }
+
         HintPlank(modifier = Modifier.align(Alignment.BottomCenter))
         HintButton(modifier = Modifier.align(Alignment.BottomEnd))
     }
 }
 
 @Composable
-fun InGameScreenContent() {
+fun InGameScreenContent(
+    themeId: String?,
+    question: QuestionUiModel?
+) {
     Column(
         verticalArrangement = Arrangement.Top
     ) {
 
         //TITRE
         Text(
-            text = "THEMES",
+            text = themeId ?: "",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
@@ -53,13 +74,13 @@ fun InGameScreenContent() {
             color = Color.White
         )
 
-        LeafQuestionFrame(modifier = Modifier.fillMaxWidth())
+        LeafQuestionFrame(modifier = Modifier.fillMaxWidth(), question)
 
     }
 }
 
 @Composable
-fun LeafQuestionFrame(modifier: Modifier = Modifier) {
+fun LeafQuestionFrame(modifier: Modifier = Modifier, question: QuestionUiModel?) {
     Box {
         Image(
             painter = painterResource(id = R.drawable.leaf_frame),
@@ -84,7 +105,7 @@ fun LeafQuestionFrame(modifier: Modifier = Modifier) {
 
             //QUESTION BODY
             Text(
-                text = ".........",
+                text = question?.question ?: "",
                 modifier = Modifier
                     //                .align(Alignment.CenterHorizontally)
                     .padding(horizontal = 20.dp, vertical = 10.dp),
@@ -140,5 +161,5 @@ fun HintButton(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun QuestionScreenPreview() {
-    QuestionScreen("", "")
+    QuestionScreen("Les bases", "")
 }

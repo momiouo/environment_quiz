@@ -55,7 +55,7 @@ fun LevelScreenContent(
             .padding(5.dp)
     ) {
         Text(
-            text = "Niveau",
+            text = themeId ?: "",
             fontSize = 45.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
