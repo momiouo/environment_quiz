@@ -23,7 +23,7 @@ class QuestionViewModel @Inject constructor(
     private val selectedLevelId: StateFlow<String> = savedStateHandle.getStateFlow("levelId", "")
 
     val questionUiState: StateFlow<QuestionUiState> =
-        getQuestionUseCase.invoke(selectedThemeId.toString(), selectedLevelId.toString())
+        getQuestionUseCase.invoke(selectedThemeId.value, selectedLevelId.value)
             .map { questionList ->
                 QuestionUiState.Loaded(questionList.map { it.toQuestionUiModel() })
             }.stateIn(

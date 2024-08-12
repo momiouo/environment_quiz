@@ -5,7 +5,6 @@ import com.momiouo.naturequiz.data.datasource.db.AppDatabase
 import com.momiouo.naturequiz.data.datasource.db.entity.toQuestion
 import com.momiouo.naturequiz.domain.model.Question
 import com.momiouo.naturequiz.domain.repository.QuestionRepository
-import dagger.Provides
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
