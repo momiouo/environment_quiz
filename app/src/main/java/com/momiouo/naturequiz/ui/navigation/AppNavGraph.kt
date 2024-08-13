@@ -1,10 +1,6 @@
 package com.momiouo.naturequiz.ui.navigation
 
 import android.util.Log
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
@@ -80,14 +76,7 @@ fun AppNavHost() {
                 "positionId"
             ) {
                 type = NavType.IntType
-            }),
-            enterTransition = { fadeIn(tween(1000)) },
-            exitTransition = { fadeOut(tween(700)) },
-            popEnterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.End, tween(700)
-                )
-            }
+            })
         ) { backStackEntry ->
             val themeId = backStackEntry.arguments?.getString("themeId")
             val levelId = backStackEntry.arguments?.getString("levelId")

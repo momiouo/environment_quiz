@@ -10,14 +10,14 @@
     <string name="end_of_quiz">Fin du Quiz</string>
     <string name="loading">Chargement…</string>
     <string name="question">Question %1$s :</string>
-    <string name="niveau_1">Niveau 1</string>
-    <string name="le_tri_et_la_d_composition">Le Tri et la Décomposition</string>
-    <string name="les_bases">Les Bases</string>
-    <string name="les_chiffres_cl_s">Les Chiffres Clés</string>
-    <string name="les_animaux">Les Animaux</string>
-    <string name="les_tops_news">Les Tops News</string>
+    <string name="niveau">Niveau %1$s</string>
+    <string name="le_tri_et_la_d_composition">Tri et Décomposition</string>
+    <string name="les_bases">Bases</string>
+    <string name="les_chiffres_cl_s">Chiffres Clés</string>
+    <string name="les_animaux">Animaux</string>
+    <string name="les_tops_news">Tops News</string>
     <string name="digital">Digital</string>
-    <string name="climate_change">Climate Change</string>
+    <string name="climate_change">Changement Climatique</string>
     <string name="themes">Themes</string>
 
 </resources>

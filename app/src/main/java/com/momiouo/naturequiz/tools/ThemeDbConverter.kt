@@ -9,14 +9,18 @@ class ThemeDbConverter {
         fun fromUiThemeToDBTheme(uiTheme: String): String? {
             Log.d("ThemeDbConverter", "fromUiThemeToDBTheme() called with: uiTheme = $uiTheme")
             return when (uiTheme) {
-                "Les Bases" -> "Lesbases"
-                "Random" -> "Random"
-                "Les Chiffres Clés" -> "Chiffre"
-                "Les Animaux" -> "Animaux"
-                "Les Tops News" -> "topnews"
-                "Le Tri et la Décomposition" -> "Decomposition"
+                "Bases" -> "Lesbases"
+                "Basics" -> "Lesbases"
+                "Chiffres Clés" -> "Chiffre"
+                "Key Data" -> "Chiffre"
+                "Animaux" -> "Animaux"
+                "Animals" -> "Animaux"
+                "Tops News" -> "topnews"
+                "Tri et Décomposition" -> "Decomposition"
+                "Sort And Decomposition" -> "Decomposition"
                 "Digital" -> "digital"
                 "Climate Change" -> "climatechange"
+                "Changement Climatique" -> "climatechange"
                 else -> null
             }
 

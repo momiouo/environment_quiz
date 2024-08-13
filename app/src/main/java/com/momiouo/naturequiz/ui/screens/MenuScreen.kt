@@ -61,13 +61,13 @@ fun MenuScreenContent(
 
         items(
             listOf(
-                ButtonTheme(context.getString(R.string.le_tri_et_la_d_composition), R.drawable.sortingbackground, 140),
                 ButtonTheme(context.getString(R.string.les_bases), R.drawable.basicsbackground, 10),
                 ButtonTheme(context.getString(R.string.les_chiffres_cl_s), R.drawable.keydatabackground, 25),
                 ButtonTheme(context.getString(R.string.les_animaux), R.drawable.animalsbackground, 10),
                 ButtonTheme(context.getString(R.string.les_tops_news), R.drawable.topnewsbackground, 10),
                 ButtonTheme(context.getString(R.string.digital), R.drawable.digitalbackground, 10),
                 ButtonTheme(context.getString(R.string.climate_change), R.drawable.climatechangebackground, 15),
+                ButtonTheme(context.getString(R.string.le_tri_et_la_d_composition), R.drawable.sortingbackground, 140),
             )
         ) { btnObj ->
             Box(modifier = Modifier

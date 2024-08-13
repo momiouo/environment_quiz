@@ -23,6 +23,18 @@ interface QuestionDAO {
         position: Int
     ): Flow<QuestionEntity?>
 
+    @Query("SELECT * FROM exotypeqcmen WHERE theme=:theme AND niveau=:level LIMIT 1 OFFSET :position")
+    fun getQuestionByThemeLevelPositionEN(
+        theme: String,
+        level: String,
+        position: Int
+    ): Flow<QuestionEntity?>
+
+    @Query("SELECT count(DISTINCT niveau) FROM exotypeqcm WHERE theme=:theme")
+    fun getLevelByTheme(
+        theme: String
+    ): Flow<Int>
+
     @Query("SELECT count(*) FROM exotypeqcm WHERE theme=:theme AND niveau=:level")
     fun getQuestionCountByThemeLevel(
         theme: String,
