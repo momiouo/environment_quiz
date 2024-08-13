@@ -1,5 +1,6 @@
 package com.momiouo.naturequiz.di
 
+import com.momiouo.naturequiz.data.datasource.datastore.AppSharedPref
 import com.momiouo.naturequiz.data.datasource.db.AppDatabase
 import com.momiouo.naturequiz.data.repository.QuestionRepositoryImpl
 import com.momiouo.naturequiz.domain.repository.QuestionRepository
@@ -14,5 +15,6 @@ object RepoModule {
     @Provides
     fun providesQuestionRepository(
         database: AppDatabase,
-    ): QuestionRepository = QuestionRepositoryImpl(database)
+        appSharedPref: AppSharedPref
+    ): QuestionRepository = QuestionRepositoryImpl(database, appSharedPref)
 }

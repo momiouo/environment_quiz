@@ -1,24 +1,22 @@
 package com.momiouo.naturequiz.domain.usecase
 
 import android.util.Log
-import com.momiouo.naturequiz.domain.model.Question
 import com.momiouo.naturequiz.domain.repository.QuestionRepository
 import com.momiouo.naturequiz.tools.ThemeDbConverter
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetQuestionUseCase @Inject constructor(
+class GetQuestionNumberThemeLevelUseCase @Inject constructor(
     private val repository: QuestionRepository
 ) {
-    operator fun invoke(theme: String, level: String, position: Int): Flow<Question?> {
+    operator fun invoke(theme: String, level: String): Flow<Int> {
         Log.d(
-            "GetQuestionUseCase",
-            "invoke() called with: theme = $theme, level = $level, position = $position"
+            "GetQuestionNumberThemeLevelUseCase",
+            "invoke() called with: theme = $theme, level = $level"
         )
-        return repository.getQuestion(
+        return repository.getQuestionNumberThemeLevelUseCase(
             ThemeDbConverter.fromUiThemeToDBTheme(theme) ?: "",
-            level,
-            position
+            level
         )
     }
 

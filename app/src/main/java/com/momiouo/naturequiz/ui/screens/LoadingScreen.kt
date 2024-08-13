@@ -27,7 +27,7 @@ import kotlinx.coroutines.delay
 fun LoadingScreen(
     navigateToMenuScreen: () -> Unit
 ) {
-    val loadingScreenDelay = 3_000L
+    val loadingScreenDelay = 1_500L
 
     //Maybe not the best way to navigate ... should be controlled by a val in viewModel...
     LaunchedEffect(Unit) {

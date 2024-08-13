@@ -15,9 +15,17 @@ interface QuestionDAO {
     @Query("SELECT * FROM exotypeqcm")
     suspend fun getAllQuestions(): List<QuestionEntity>
 
-    @Query("SELECT * FROM exotypeqcm WHERE theme=:theme AND niveau=:level")
-    fun getAllQuestionsByThemeLevel(
+    //OFFSET SKIP row before :position
+    @Query("SELECT * FROM exotypeqcm WHERE theme=:theme AND niveau=:level LIMIT 1 OFFSET :position")
+    fun getQuestionByThemeLevelPosition(
         theme: String,
-        level: String
-    ): Flow<List<QuestionEntity>>
+        level: String,
+        position: Int
+    ): Flow<QuestionEntity?>
+
+    @Query("SELECT count(*) FROM exotypeqcm WHERE theme=:theme AND niveau=:level")
+    fun getQuestionCountByThemeLevel(
+        theme: String,
+        level: String,
+    ): Flow<Int>
 }

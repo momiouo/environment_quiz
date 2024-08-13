@@ -4,5 +4,9 @@ import com.momiouo.naturequiz.domain.model.Question
 import kotlinx.coroutines.flow.Flow
 
 interface QuestionRepository {
-    fun getQuestions(theme: String, level: String): Flow<List<Question>>
+    fun getQuestion(theme: String, level: String, position: Int): Flow<Question?>
+    suspend fun saveIsGoodAnswer(isGoodAnswer: Boolean)
+    suspend fun resetIsGoodAnswerCounter()
+    fun getQuestionNumberThemeLevelUseCase(theme: String, level: String): Flow<Int>
+    fun getGoodAnswerCounter(): Flow<Int>
 }
