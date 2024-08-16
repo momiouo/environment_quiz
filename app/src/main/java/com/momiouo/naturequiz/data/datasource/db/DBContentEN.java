@@ -377,13 +377,13 @@ public class DBContentEN {
         db.execSQL("Insert into exotypeqcmen (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",1," +
                 "\"Which of these animals is also responsible for the pollution?\"," +
-                " 2,\"chien.jpg\",\"vache.jpg\",\"elephant.jpg\"," +
+                " 2,\"Dog\",\"Cow\",\"Elephant\"," +
                 "\"It is a herbivore.\"," +
                 "\"The cow produces methane by farting, it is a very harmful greenhouse gas French cows emit as much gas in a year as 15 million cars!\");");
         db.execSQL("Insert into exotypeqcmen (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",2," +
                 "\"What is the oldest animal still living on Earth?\"," +
-                " 3,\"crocodile.jpg\",\"mathusalem.jpg\",\"coelacanthe.jpg\"," +
+                " 3,\"Crocodile\",\"Mathusalem\",\"Coelacanthe\"," +
                 "\"It is found in the Indian Ocean.\"," +
                 "\"It is the coelacanth (a large carnivorous fish whose oldest fossil dates back to 400 million years), which was believed to have disappeared 70 million years ago. Paleontologists were therefore amazed to find one alive in 1938, on the coast of South Africa. Since then, around 200 specimens have been caught in the Indian Ocean.\");");
     }

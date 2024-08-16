@@ -9,6 +9,7 @@ lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.06.00"
 navigationCompose = "2.7.7"
+playServicesAdsVersion = "23.3.0"
 roomCommon = "2.6.1"
 roomKtx = "2.6.1"
 hilt = "2.51.1"
@@ -19,6 +20,7 @@ datastoreCoreAndroid = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+gms-play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAdsVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

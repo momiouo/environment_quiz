@@ -261,13 +261,13 @@ public class DBContent {
         db.execSQL("Insert into exotypeqcm (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",1," +
                 "\"Lequel de ces animaux est aussi responsable de la pollution ?\"," +
-                " 2,\"chien.jpg\",\"vache.jpg\",\"elephant.jpg\"," +
+                " 2,\"Le chien\",\"La vache\",\"L'éléphant\"," +
                 "\"C’est un herbivore\"," +
                 "\"La vache produit du méthane en pétant, c’est un gaz à effet de serre très nocif Les vaches françaises émettent autant de gaz en un an que 15 millions de voitures !\");");
         db.execSQL("Insert into exotypeqcm (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",2," +
                 "\"Quel est l’animal le plus ancien vivant encore sur Terre ?\"," +
-                " 3,\"crocodile.jpg\",\"mathusalem.jpg\",\"coelacanthe.jpg\"," +
+                " 3,\"Le crocodile\",\"Le mathusalem\",\"Le coelacanthe\"," +
                 "\"On le trouve dans l’Océan Indien\"," +
                 "\"C’est le coelacanthe (un gros poisson carnivore dont le plus ancien fossile date de 400 millions d’années), que l’on croyait disparu il y a 70 millions d’années. Les paléontologues ont donc été stupéfaits d’en trouver un vivant en 1938, sur les côtes d’Afrique du Sud. Depuis, environ 200 spécimens ont été pêchés dans l’océan Indien.\");");
     }
@@ -277,14 +277,14 @@ public class DBContent {
         db.execSQL("Insert into exotypeqcm (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",1," +
                 "\"Lequel de ces animaux est aussi responsable de la pollution ?\"," +
-                " 2,\"chien.jpg\",\"vache.jpg\",\"elephant.jpg\"," +
+                " 2,\"Le chien\",\"La vache\",\"L'éléphant\"," +
                 "\"C’est un herbivore\"," +
                 "\"La vache produit du méthane en pétant, c’est un gaz à effet de serre très nocif Les vaches françaises émettent autant de gaz en un an que 15 millions de voitures !\");");
 
         db.execSQL("Insert into exotypeqcm (theme, niveau, question, positiongoodanswer, answer1, answer2, answer3, indice, explication) " +
                 "VALUES(\"Animaux\",2," +
                 "\"Quel est l’animal le plus ancien vivant encore sur Terre ?\"," +
-                " 3,\"crocodile.jpg\",\"mathusalem.jpg\",\"coelacanthe.jpg\"," +
+                " 3,\"Le crocodile\",\"Le mathusalem\",\"Le coelacanthe\"," +
                 "\"On le trouve dans l’Océan Indien\"," +
                 "\"C’est le coelacanthe (un gros poisson carnivore dont le plus ancien fossile date de 400 millions d’années), que l’on croyait disparu il y a 70 millions d’années. Les paléontologues ont donc été stupéfaits d’en trouver un vivant en 1938, sur les côtes d’Afrique du Sud. Depuis, environ 200 spécimens ont été pêchés dans l’océan Indien.\");");
 

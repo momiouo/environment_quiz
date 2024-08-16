@@ -9,7 +9,7 @@
     <string name="end_of_quiz">End of Quiz</string>
     <string name="loading">Loading…</string>
     <string name="question">Question %1$s :</string>
-    <string name="niveau">Niveau %1$s</string>
+    <string name="niveau">Level %1$s</string>
     <string name="le_tri_et_la_d_composition">Sort And Decomposition</string>
     <string name="les_bases">Basics</string>
     <string name="les_chiffres_cl_s">Key Data</string>

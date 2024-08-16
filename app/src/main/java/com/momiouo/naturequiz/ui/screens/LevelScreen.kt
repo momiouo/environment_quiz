@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +42,7 @@ fun LevelScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         BackgroundImageMenu() //TODO write this in common
+        FlowerWaterDeco(modifier = Modifier.align(Alignment.BottomCenter))
         when (val levelState = levelUiState) {
             is LevelUiState.Loaded -> LevelScreenContent(
                 themeId,
@@ -50,7 +52,6 @@ fun LevelScreen(
 
             LevelUiState.Loading -> Text(text = stringResource(id = R.string.loading))
         }
-        FlowerWaterDeco(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -67,8 +68,7 @@ fun LevelScreenContent(
     ) {
         Text(
             text = themeId ?: "",
-            fontSize = 45.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

@@ -1,5 +1,6 @@
 package com.momiouo.naturequiz.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,13 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.momiouo.naturequiz.ui.common.CustomLargeButton
@@ -40,6 +43,7 @@ fun QuestionScreen(
     questionViewModel: QuestionViewModel = hiltViewModel(),
     navigateToEndScreen: () -> Unit
 ) {
+    val context = LocalContext.current
 
     val questionUiState by questionViewModel.questionUiState.collectAsStateWithLifecycle()
 
@@ -67,7 +71,19 @@ fun QuestionScreen(
             is QuestionUiState.Loaded -> {
                 if (questionState.isAnswered) {
                     delay(1_000L)
-                    navigateToNextQuestion(themeId ?: "", levelId ?: "", positionId?.plus(1) ?: 0)
+                    val localNavigateToNextQuestion = {
+                        navigateToNextQuestion(
+                            themeId ?: "",
+                            levelId ?: "",
+                            positionId?.plus(1) ?: 0
+                        )
+                    }
+                    if (positionId == 3) {
+                        Log.d("QuestionScreen", "QuestionScreen() called showInterstitialAd")
+                        questionViewModel.showInterstitialAd(context, localNavigateToNextQuestion)
+                    } else {
+                        localNavigateToNextQuestion()
+                    }
                 }
             }
 
@@ -108,48 +124,65 @@ fun InGameScreenContent(
     decideButtonColor: (Boolean) -> Color,
 ) {
 
-    Column(
-        verticalArrangement = Arrangement.Top
+    LazyColumn(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        //TITRE
-        Text(
-            text = themeId ?: "",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            textAlign = TextAlign.Center,
-            fontSize = 45.sp,
-            color = Color.White
-        )
-
-        LeafQuestionFrame(modifier = Modifier.fillMaxWidth(), question, positionId)
-
-        CustomLargeButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = question?.firstResponse ?: "",
-            buttonColor = decideButtonColor(question?.correctAnswer == 1),
-            enabled = !isAnswered,
-        ) {
-            saveIsGoodAnswer(question?.correctAnswer == 1)
+        item {
+            Text(
+                text = themeId ?: "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 10.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
+            )
         }
 
-        CustomLargeButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = question?.secondResponse ?: "",
-            buttonColor = decideButtonColor(question?.correctAnswer == 2),
-            enabled = !isAnswered,
-        ) {
-            saveIsGoodAnswer(question?.correctAnswer == 2)
+
+        item {
+            LeafQuestionFrame(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                question,
+                positionId
+            )
         }
 
-        CustomLargeButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = question?.thirdResponse ?: "",
-            buttonColor = decideButtonColor(question?.correctAnswer == 3),
-            enabled = !isAnswered,
-        ) {
-            saveIsGoodAnswer(question?.correctAnswer == 3)
+
+        //TODO uses items for each button...
+        item {
+            CustomLargeButton(
+                text = question?.firstResponse ?: "",
+                buttonColor = decideButtonColor(question?.correctAnswer == 1),
+                enabled = !isAnswered,
+            ) {
+                saveIsGoodAnswer(question?.correctAnswer == 1)
+            }
+        }
+
+
+        item {
+            CustomLargeButton(
+                text = question?.secondResponse ?: "",
+                buttonColor = decideButtonColor(question?.correctAnswer == 2),
+                enabled = !isAnswered,
+            ) {
+                saveIsGoodAnswer(question?.correctAnswer == 2)
+            }
+        }
+
+
+        item {
+            CustomLargeButton(
+                text = question?.thirdResponse ?: "",
+                buttonColor = decideButtonColor(question?.correctAnswer == 3),
+                enabled = !isAnswered,
+            ) {
+                saveIsGoodAnswer(question?.correctAnswer == 3)
+            }
         }
 
     }
@@ -157,14 +190,17 @@ fun InGameScreenContent(
 
 @Composable
 fun LeafQuestionFrame(modifier: Modifier = Modifier, question: QuestionUiModel?, positionId: Int?) {
-    Box {
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         Image(
             painter = painterResource(id = R.drawable.leaf_frame),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
-            modifier = modifier
-                .fillMaxWidth()
-                .height(120.dp)
+            modifier = modifier.height(200.dp)
         )
 
         //QUESTION PRE-
@@ -173,8 +209,8 @@ fun LeafQuestionFrame(modifier: Modifier = Modifier, question: QuestionUiModel?,
                 text = stringResource(R.string.question, positionId?.plus(1) ?: 0),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 15.dp),
-                fontSize = 23.sp,
+                    .padding(top = 10.dp, start = 30.dp),
+                style = MaterialTheme.typography.bodyLarge,
                 color = Color.White
             )
 
@@ -182,11 +218,9 @@ fun LeafQuestionFrame(modifier: Modifier = Modifier, question: QuestionUiModel?,
             Text(
                 text = question?.question ?: "",
                 modifier = Modifier
-                    //                .align(Alignment.CenterHorizontally)
-                    .padding(horizontal = 20.dp, vertical = 10.dp),
-                fontWeight = FontWeight.Bold,
-                fontSize = 17.sp,
-                color = Color.White
+                    .padding(start = 30.dp, top = 10.dp, end = 30.dp, bottom = 10.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
             )
         }
     }

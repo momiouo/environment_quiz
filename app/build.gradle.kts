@@ -13,7 +13,7 @@ android {
         applicationId = "fr.momiouo.naturequiz"
         minSdk = 29
         targetSdk = 34
-        versionCode = 100
+        versionCode = 103
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -71,6 +71,7 @@ dependencies {
     kapt(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
+    implementation(libs.gms.play.services.ads)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.momiouo.naturequiz.R
@@ -76,41 +76,7 @@ fun EndScreenContent(
             .fillMaxSize()
             .padding(5.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .wrapContentHeight()
-                .align(Alignment.TopCenter)
-        ) {
-            Text(
-                text = stringResource(R.string.end_of_quiz),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 20.dp),
-                fontSize = 45.sp,
-                color = Color.White
-            )
-
-            Text(
-                text = stringResource(id = R.string.scoretotal) + score + "%",
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 60.dp),
-                fontSize = 35.sp,
-                color = Color.White
-            )
-
-            Text(
-                text = text,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 80.dp),
-                fontSize = 25.sp,
-                color = Color.Green,
-                textAlign = TextAlign.Center
-            )
-
-
-        }
+        //TODO name this Image and put them outside ...
         Image(
             painter = painterResource(id = R.drawable.tree),
             contentDescription = null,
@@ -141,6 +107,43 @@ fun EndScreenContent(
                     navigateToQuestionScreen(theme, level)
                 }
         )
+
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .align(Alignment.TopCenter)
+        ) {
+            Text(
+                text = stringResource(R.string.end_of_quiz),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 20.dp),
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
+            )
+
+            Text(
+                text = stringResource(id = R.string.scoretotal) + score + "%",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 60.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
+            )
+
+            Text(
+                text = text,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 80.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Green,
+                textAlign = TextAlign.Center
+            )
+
+
+        }
+
     }
 }
 
