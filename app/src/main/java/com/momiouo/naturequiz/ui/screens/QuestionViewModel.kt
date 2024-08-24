@@ -13,7 +13,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.momiouo.naturequiz.domain.model.toQuestionUiModel
 import com.momiouo.naturequiz.domain.usecase.GetQuestionUseCase
 import com.momiouo.naturequiz.domain.usecase.SaveIsGoodAnswerUseCase
-import com.momiouo.naturequiz.tools.Const
 import com.momiouo.naturequiz.tools.getActivityOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -42,18 +41,23 @@ class QuestionViewModel @Inject constructor(
     private val _isQuestionAnswered = MutableStateFlow(false)
     val isQuestionAnswered = _isQuestionAnswered.asStateFlow()
 
+    private val _isAdLoading = MutableStateFlow(false)
+    val isAdLoading = _isAdLoading.asStateFlow()
+
     val questionUiState: StateFlow<QuestionUiState> =
-        getQuestionUseCase.invoke(
-            selectedThemeId.value,
-            selectedLevelId.value,
-            selectedPositionId.value
-        ).combine(_isQuestionAnswered) { question, isAnswered ->
+        combine(
+            getQuestionUseCase.invoke(
+                selectedThemeId.value,
+                selectedLevelId.value,
+                selectedPositionId.value
+            ), _isQuestionAnswered, _isAdLoading
+        ) { question, isAnswered, isAdLoading ->
             Log.d(
                 "QuestionViewModel",
-                "questionUiStateFlow() called with: question = $question, isAnswered = $isAnswered"
+                "questionUiStateFlow() called with: question = $question, isAnswered = $isAnswered, isAdLoading = $isAdLoading"
             )
             if (question != null) {
-                QuestionUiState.Loaded(question.toQuestionUiModel(), isAnswered)
+                QuestionUiState.Loaded(question.toQuestionUiModel(), isAnswered, isAdLoading)
             } else {
                 QuestionUiState.Finished
             }
@@ -69,25 +73,28 @@ class QuestionViewModel @Inject constructor(
     }
 
     //TODO Add this logic in a repo then use case then here ...
-    fun showInterstitialAd(context: Context, goToNextQuestion: () -> Unit) {
+    fun showInterstitialAd(context: Context, admobId: String, onAdFinished: () -> Unit) {
         Log.d(
             "QuestionViewModel",
-            "showInterstialAd() called with: context = $context, goToNextQuestion = $goToNextQuestion"
+            "showInterstialAd() called with: context = $context, goToNextQuestion = $onAdFinished"
         )
+        _isAdLoading.update { true }
         val adCallBack = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
-                goToNextQuestion()
+                onAdFinished()
+                _isAdLoading.update { false }
             }
         }
 
         InterstitialAd.load(
             context,
-            Const.ADMOB_ID_INTERSTITIAL_Q4_5,
+            admobId,
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     Log.d("QuestionViewModel", "onAdFailedToLoad() called with: adError = $adError")
-                    goToNextQuestion()
+                    onAdFinished()
+                    _isAdLoading.update { false }
                 }
 
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
@@ -112,7 +119,8 @@ sealed interface QuestionUiState {
 
     data class Loaded(
         val question: QuestionUiModel?,
-        val isAnswered: Boolean
+        val isAnswered: Boolean,
+        val isAdLoading: Boolean
     ) : QuestionUiState
 
 }
@@ -123,6 +131,7 @@ data class QuestionUiModel(
     val secondResponse: String,
     val thirdResponse: String,
     val correctAnswer: Int,
-    val hint: String
+    val hint: String,
+    val explanation: String
 )
 

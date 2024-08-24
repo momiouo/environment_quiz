@@ -45,6 +45,7 @@ fun QuestionEntity.toQuestion(): Question {
         secondResponse = answer2 ?: "",
         thirdResponse = answer3 ?: "",
         correctAnswer = goodanswer,
-        hint = indice ?: ""
+        hint = indice ?: "",
+        explanation = explication ?: ""
     )
 }

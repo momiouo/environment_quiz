@@ -30,7 +30,7 @@ fun CustomLargeButton(
         modifier = modifier
             .width(275.dp)
             .height(IntrinsicSize.Min)
-            .padding(top = 70.dp)
+            .padding(top = 40.dp)
             .clip(shape = CircleShape)
             .background(buttonColor),
         colors = ButtonDefaults.buttonColors().copy(containerColor = buttonColor),

@@ -8,7 +8,8 @@ data class Question(
     val secondResponse: String,
     val thirdResponse: String,
     val correctAnswer: Int,
-    val hint: String
+    val hint: String,
+    val explanation: String
 )
 
 fun Question.toQuestionUiModel(): QuestionUiModel {
@@ -18,6 +19,7 @@ fun Question.toQuestionUiModel(): QuestionUiModel {
         secondResponse = secondResponse,
         thirdResponse = thirdResponse,
         correctAnswer = correctAnswer,
-        hint = hint
+        hint = hint,
+        explanation = explanation
     )
 }
