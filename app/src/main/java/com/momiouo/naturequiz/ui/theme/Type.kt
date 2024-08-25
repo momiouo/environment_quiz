@@ -1,6 +1,7 @@
 package com.momiouo.naturequiz.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -16,7 +17,8 @@ val Typography = Typography(
         fontSize = 50.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        color = Color.White
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.simsonfont)),
@@ -24,7 +26,8 @@ val Typography = Typography(
         fontSize = 30.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        color = Color.White
     ),
 //    labelSmall = TextStyle(
 //        fontFamily = FontFamily(Font(R.font.simsonfont)),

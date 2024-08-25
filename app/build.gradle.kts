@@ -13,7 +13,7 @@ android {
         applicationId = "fr.momiouo.naturequiz"
         minSdk = 29
         targetSdk = 34
-        versionCode = 103
+        versionCode = 104
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
