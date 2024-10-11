@@ -1,10 +1,6 @@
 package com.momiouo.naturequiz.ui.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.momiouo.naturequiz.ui.common.BackgroundImage
 import fr.momiouo.naturequiz.R
 import kotlinx.coroutines.delay
 
@@ -35,29 +32,15 @@ fun LoadingScreen(
         navigateToMenuScreen()
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        BackgroundImage()
-        LoadingScreenContent()
-        FlowerImage(modifier = Modifier.align(Alignment.BottomEnd))
+
+    BackgroundImage(backgroundResource = R.drawable.our_bg_branch) {
+        LogoWithSpinAnimation(modifier = Modifier.align(Alignment.Center))
     }
+
 }
 
 @Composable
-fun LoadingScreenContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        LogoWithSpinAnimation()
-    }
-}
-
-@Composable
-fun LogoWithSpinAnimation() {
+fun LogoWithSpinAnimation(modifier: Modifier = Modifier) {
     var rotation by remember { mutableFloatStateOf(0f) }
 
     LaunchedEffect(Unit) {
@@ -70,45 +53,15 @@ fun LogoWithSpinAnimation() {
         }
     }
 
-    Box(
-        modifier = Modifier
-            .size(200.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.load_earth),
-            contentDescription = "",
-            modifier = Modifier
-                .graphicsLayer {
-                    rotationZ = rotation
-                },
-            contentScale = ContentScale.Fit,
-        )
-    }
-}
-
-@Composable
-fun BackgroundImage() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Image(
-            painter = painterResource(R.drawable.our_bg),
-            contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-@Composable
-fun FlowerImage(modifier: Modifier) {
     Image(
-        painter = painterResource(R.drawable.flower_tree),
-        contentDescription = null,
+        painter = painterResource(R.drawable.load_earth),
+        contentDescription = "",
+        modifier = modifier
+            .size(200.dp)
+            .graphicsLayer {
+                rotationZ = rotation
+            },
         contentScale = ContentScale.Fit,
-        modifier = modifier.size(200.dp)
     )
 }
 

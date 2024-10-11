@@ -1,4 +1,4 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.level
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

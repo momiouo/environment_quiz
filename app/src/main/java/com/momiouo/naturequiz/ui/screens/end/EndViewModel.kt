@@ -1,4 +1,4 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.end
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
@@ -25,7 +25,7 @@ class EndViewModel @Inject constructor(
     private val resetIsGoodAnswerCounterUseCase: ResetIsGoodAnswerCounterUseCase
 ) : ViewModel() {
 
-    //TODO create arguments key constant in nav graph
+    //TODO create constant arguments key in nav graph
     private val selectedThemeId: StateFlow<String> = savedStateHandle.getStateFlow("themeId", "")
     private val selectedLevelId: StateFlow<String> = savedStateHandle.getStateFlow("levelId", "")
 

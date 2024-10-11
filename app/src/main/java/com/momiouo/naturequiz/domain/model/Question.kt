@@ -1,6 +1,6 @@
 package com.momiouo.naturequiz.domain.model
 
-import com.momiouo.naturequiz.ui.screens.QuestionUiModel
+import com.momiouo.naturequiz.ui.screens.question.QuestionUiModel
 
 data class Question(
     val question: String,

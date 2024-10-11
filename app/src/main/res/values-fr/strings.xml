@@ -19,5 +19,6 @@
     <string name="digital">Digital</string>
     <string name="climate_change">Changement Climatique</string>
     <string name="themes">Themes</string>
+    <string name="menu_button_background">bouton menu image</string>
 
 </resources>

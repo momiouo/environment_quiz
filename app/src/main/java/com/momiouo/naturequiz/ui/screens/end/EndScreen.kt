@@ -1,4 +1,4 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.end
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -23,15 +23,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.momiouo.naturequiz.ui.common.BackgroundImage
 import fr.momiouo.naturequiz.R
 
 @Composable
 fun EndScreen(
+    endViewModel: EndViewModel = hiltViewModel(),
     theme: String,
     level: String,
     navigateToQuestionScreen: (theme: String, level: String) -> Unit,
-    navigateToMenuScreen: () -> Unit,
-    endViewModel: EndViewModel = hiltViewModel()
+    navigateToMenuScreen: () -> Unit
 ) {
 
     val endUiState by endViewModel.endUiState.collectAsStateWithLifecycle()
@@ -43,10 +44,9 @@ fun EndScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        BackgroundImageMenu() //TODO write this in common
+
+    BackgroundImage(backgroundResource = R.drawable.our_mainbg_tree) {
+
         when (val endState = endUiState) {
             is EndUiState.Loaded -> EndScreenContent(
                 theme = theme,
@@ -76,15 +76,7 @@ fun EndScreenContent(
             .fillMaxSize()
             .padding(5.dp)
     ) {
-        //TODO name this Image and put them outside ...
-        Image(
-            painter = painterResource(id = R.drawable.tree),
-            contentDescription = null,
-            modifier = Modifier
-                .size(300.dp)
-                .align(Alignment.BottomCenter)
-                .padding(top = 5.dp)
-        )
+
         Image(
             painter = painterResource(id = R.drawable.home),
             contentDescription = null,
@@ -145,6 +137,15 @@ fun EndScreenContent(
         }
 
     }
+}
+
+@Composable
+fun TreeDeco(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(id = R.drawable.tree),
+        contentDescription = null,
+        modifier = modifier
+    )
 }
 
 @Preview

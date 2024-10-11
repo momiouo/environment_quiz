@@ -1,12 +1,9 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.level
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,15 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.momiouo.naturequiz.ui.common.BackgroundImage
 import com.momiouo.naturequiz.ui.common.CustomLargeButton
 import com.momiouo.naturequiz.ui.theme.Orange
 import fr.momiouo.naturequiz.R
@@ -31,18 +26,15 @@ import fr.momiouo.naturequiz.R
 
 @Composable
 fun LevelScreen(
-    themeId: String?,
-    navigateToQuestion: (String, String) -> Unit,
-    levelViewModel: LevelViewModel = hiltViewModel()
+    levelViewModel: LevelViewModel = hiltViewModel(),
+    themeId: Int?,
+    navigateToQuestion: (Int, String) -> Unit
 ) {
 
     val levelUiState by levelViewModel.levelUiState.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        BackgroundImageMenu() //TODO write this in common
-        FlowerWaterDeco(modifier = Modifier.align(Alignment.BottomCenter))
+    BackgroundImage(backgroundResource = R.drawable.our_mainbg_flower) {
+
         when (val levelState = levelUiState) {
             is LevelUiState.Loaded -> LevelScreenContent(
                 themeId,
@@ -57,9 +49,9 @@ fun LevelScreen(
 
 @Composable
 fun LevelScreenContent(
-    themeId: String?,
+    themeId: Int?,
     levelNumber: Int,
-    navigateToQuestion: (String, String) -> Unit
+    navigateToQuestion: (Int, String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -67,7 +59,7 @@ fun LevelScreenContent(
             .padding(5.dp)
     ) {
         Text(
-            text = themeId ?: "",
+            text = themeId.toString() ?: "",
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -98,18 +90,8 @@ fun LevelScreenContent(
     }
 }
 
-@Composable
-fun FlowerWaterDeco(modifier: Modifier = Modifier) {
-    Image(
-        painter = painterResource(id = R.drawable.flower_water_deco),
-        contentDescription = null,
-        modifier = modifier
-            .size(300.dp)
-    )
-}
-
 @Preview
 @Composable
 fun PreviewThemeActivity() {
-    LevelScreen(themeId = "", navigateToQuestion = { _, _ -> })
+    LevelScreen(themeId = 1, navigateToQuestion = { _, _ -> })
 }

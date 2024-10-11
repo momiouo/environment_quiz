@@ -1,4 +1,4 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.question
 
 import android.content.Context
 import android.util.Log

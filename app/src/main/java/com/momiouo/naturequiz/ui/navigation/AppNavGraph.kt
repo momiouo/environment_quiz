@@ -8,11 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.momiouo.naturequiz.ui.screens.EndScreen
-import com.momiouo.naturequiz.ui.screens.LevelScreen
 import com.momiouo.naturequiz.ui.screens.LoadingScreen
-import com.momiouo.naturequiz.ui.screens.MenuScreen
-import com.momiouo.naturequiz.ui.screens.QuestionScreen
+import com.momiouo.naturequiz.ui.screens.end.EndScreen
+import com.momiouo.naturequiz.ui.screens.level.LevelScreen
+import com.momiouo.naturequiz.ui.screens.menu.MenuScreen
+import com.momiouo.naturequiz.ui.screens.question.QuestionScreen
 
 
 @Composable
@@ -21,13 +21,15 @@ fun AppNavHost() {
 
     NavHost(navController = navController, startDestination = Screen.LoadingScreen.route) {
         composable(Screen.LoadingScreen.route) {
-            LoadingScreen(navigateToMenuScreen = {
-                navController.navigate(
-                    route = Screen.MenuScreen.route,
-                    navOptions = NavOptions.Builder().setPopUpTo(Screen.LoadingScreen.route, true)
-                        .build()
-                )
-            })
+            LoadingScreen(
+                navigateToMenuScreen = {
+                    navController.navigate(
+                        route = Screen.MenuScreen.route,
+                        navOptions = NavOptions.Builder()
+                            .setPopUpTo(Screen.LoadingScreen.route, true)
+                            .build()
+                    )
+                })
         }
 
         composable(Screen.MenuScreen.route) {
@@ -43,10 +45,10 @@ fun AppNavHost() {
         composable(
             route = Screen.LevelScreen.route + "/{themeId}",
             arguments = listOf(navArgument("themeId") {
-                type = NavType.StringType
+                type = NavType.IntType
             })
         ) { backStackEntry ->
-            val themeId = backStackEntry.arguments?.getString("themeId")
+            val themeId = backStackEntry.arguments?.getInt("themeId")
             val initialPosition = 0
             LevelScreen(
                 themeId = themeId,
@@ -82,9 +84,9 @@ fun AppNavHost() {
             val levelId = backStackEntry.arguments?.getString("levelId")
             val positionId = backStackEntry.arguments?.getInt("positionId")
             QuestionScreen(
-                themeId,
-                levelId,
-                positionId,
+                themeId = themeId,
+                levelId = levelId,
+                positionId = positionId,
                 navigateToNextQuestion = { theme, level, position ->
                     Log.d(
                         "AppNavGraph",

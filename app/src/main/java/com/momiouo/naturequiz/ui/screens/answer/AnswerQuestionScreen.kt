@@ -1,8 +1,7 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.answer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.momiouo.naturequiz.ui.common.BackgroundImage
 import fr.momiouo.naturequiz.R
 
+//TODO THIS SCREEN ISN'T FINISHED... put this in another feature branch
 @Composable
 fun AnswerQuestionScreen(
     answerQuestionViewModel: AnswerQuestionViewModel = hiltViewModel(),
@@ -30,11 +31,7 @@ fun AnswerQuestionScreen(
 
     val answerQuestionUiState by answerQuestionViewModel.questionUiState.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        BackgroundImageMenu() //TODO write this in common
+    BackgroundImage(backgroundResource = R.drawable.our_mainbg) {
 
         Image(
             painter = painterResource(R.drawable.green_leaf),
@@ -57,8 +54,6 @@ fun AnswerQuestionScreen(
                 ), color = Color.White
             )
         }
-
-
 
         Image(
             painter = painterResource(R.drawable.watering_tree_sm),

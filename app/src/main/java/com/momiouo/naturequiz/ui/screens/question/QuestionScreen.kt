@@ -1,8 +1,7 @@
-package com.momiouo.naturequiz.ui.screens
+package com.momiouo.naturequiz.ui.screens.question
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.momiouo.naturequiz.tools.Const
+import com.momiouo.naturequiz.ui.common.BackgroundImage
 import com.momiouo.naturequiz.ui.common.CustomLargeButton
 import com.momiouo.naturequiz.ui.theme.Orange
 import fr.momiouo.naturequiz.R
@@ -45,11 +45,11 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun QuestionScreen(
+    questionViewModel: QuestionViewModel = hiltViewModel(),
     themeId: String?,
     levelId: String?,
     positionId: Int?,
     navigateToNextQuestion: (theme: String, level: String, position: Int) -> Unit,
-    questionViewModel: QuestionViewModel = hiltViewModel(),
     navigateToEndScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -118,12 +118,11 @@ fun QuestionScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable(enabled = isClueVisible) { removeClue() },
+
+    BackgroundImage(
+        modifier = Modifier.clickable(enabled = isClueVisible) { removeClue() },
+        backgroundResource = R.drawable.our_mainbg
     ) {
-        BackgroundImageMenu() //TODO write this in common
         when (val questionState = questionUiState) {
             is QuestionUiState.Loaded -> InGameScreenContent(
                 themeId,
@@ -352,9 +351,10 @@ fun HintButton(modifier: Modifier = Modifier, isClueVisible: Boolean, onClick: (
 @Composable
 private fun QuestionScreenPreview() {
     QuestionScreen(
-        "Les bases", "",
+        themeId = "Les bases",
+        levelId = "",
         positionId = null,
         navigateToNextQuestion = { s: String, s1: String, i: Int -> },
-        navigateToEndScreen = {},
+        navigateToEndScreen = {}
     )
 }
