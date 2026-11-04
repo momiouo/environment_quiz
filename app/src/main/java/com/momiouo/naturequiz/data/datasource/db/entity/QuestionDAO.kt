@@ -12,6 +12,18 @@ interface QuestionDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestion(question: QuestionEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertQuestionEn(question: QuestionEntityEn)
+
+    @Query("SELECT COALESCE(MAX(niveau), 0) FROM exotypeqcm WHERE theme=:theme")
+    suspend fun getMaxLevelByTheme(theme: String): Int
+
+    @Query("DELETE FROM exotypeqcm WHERE theme=:theme AND niveau=:level")
+    suspend fun deleteQuestionsByThemeAndLevel(theme: String, level: Int)
+
+    @Query("DELETE FROM exotypeqcmen WHERE theme=:theme AND niveau=:level")
+    suspend fun deleteQuestionsByThemeAndLevelEn(theme: String, level: Int)
+
     @Query("SELECT * FROM exotypeqcm")
     suspend fun getAllQuestions(): List<QuestionEntity>
 

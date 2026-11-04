@@ -8,16 +8,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.momiouo.naturequiz.tools.Const
+import com.momiouo.naturequiz.tools.Const.NAVIGATION_PARAMETER_THEME
 import com.momiouo.naturequiz.ui.screens.LoadingScreen
+import com.momiouo.naturequiz.ui.screens.aiquiz.AiQuizScreen
 import com.momiouo.naturequiz.ui.screens.end.EndScreen
 import com.momiouo.naturequiz.ui.screens.level.LevelScreen
 import com.momiouo.naturequiz.ui.screens.menu.MenuScreen
 import com.momiouo.naturequiz.ui.screens.question.QuestionScreen
+import fr.momiouo.naturequiz.BuildConfig
 
 
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val TAG = "AppNavHost"
 
     NavHost(navController = navController, startDestination = Screen.LoadingScreen.route) {
         composable(Screen.LoadingScreen.route) {
@@ -35,24 +40,49 @@ fun AppNavHost() {
         composable(Screen.MenuScreen.route) {
             MenuScreen(
                 navigateToLevelScreen = { themeId ->
+                    if (themeId == Const.AI_QUIZ_THEME_ID) {
+                        navController.navigate(route = Screen.AiQuizScreen.route)
+                    } else {
+                        navController.navigate(
+                            route = Screen.LevelScreen.route + "/$themeId"
+                        )
+                    }
+                }
+            )
+        }
+
+        composable(Screen.AiQuizScreen.route) {
+            AiQuizScreen(
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                navigateToPlayQuiz = { theme, level ->
+                    val initialPosition = 0
                     navController.navigate(
-                        route = Screen.LevelScreen.route + "/$themeId"
+                        route = Screen.QuestionScreen.route + "/$theme&$level&$initialPosition",
+                        navOptions = NavOptions.Builder()
+                            .setPopUpTo(Screen.MenuScreen.route, false)
+                            .build()
                     )
                 }
             )
         }
 
         composable(
-            route = Screen.LevelScreen.route + "/{themeId}",
-            arguments = listOf(navArgument("themeId") {
+            route = Screen.LevelScreen.route + "/{$NAVIGATION_PARAMETER_THEME}",
+            arguments = listOf(navArgument(NAVIGATION_PARAMETER_THEME) {
                 type = NavType.IntType
             })
         ) { backStackEntry ->
-            val themeId = backStackEntry.arguments?.getInt("themeId")
+            val themeId = backStackEntry.arguments?.getInt(NAVIGATION_PARAMETER_THEME)
             val initialPosition = 0
             LevelScreen(
                 themeId = themeId,
                 navigateToQuestion = { theme, level ->
+                    if (BuildConfig.DEBUG) Log.d(
+                        TAG,
+                        "AppNavHost() called with: theme = $theme, level = $level"
+                    )
                     Log.d("AppNavGraph", "AppNavHost() called with: theme = $theme, level = $level")
                     navController.navigate(
                         route = Screen.QuestionScreen.route + "/$theme&$level&$initialPosition",

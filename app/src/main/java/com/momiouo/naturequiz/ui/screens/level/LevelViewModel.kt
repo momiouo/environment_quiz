@@ -17,10 +17,11 @@ class LevelViewModel @Inject constructor(
     getLevelByThemeUseCase: GetLevelByThemeUseCase,
 ) : ViewModel() {
 
-    private val selectedThemeId: StateFlow<String> = savedStateHandle.getStateFlow("themeId", "")
+    private val selectedThemeKey: String =
+        savedStateHandle.get<Any>("themeId")?.toString() ?: ""
 
     val levelUiState =
-        getLevelByThemeUseCase.invoke(selectedThemeId.value)
+        getLevelByThemeUseCase.invoke(selectedThemeKey)
             .map {
                 LevelUiState.Loaded(it)
             }

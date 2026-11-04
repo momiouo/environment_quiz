@@ -13,8 +13,12 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.momiouo.naturequiz.domain.model.toQuestionUiModel
 import com.momiouo.naturequiz.domain.usecase.GetQuestionUseCase
 import com.momiouo.naturequiz.domain.usecase.SaveIsGoodAnswerUseCase
+import com.momiouo.naturequiz.tools.Const.NAVIGATION_PARAMETER_LEVEL
+import com.momiouo.naturequiz.tools.Const.NAVIGATION_PARAMETER_POSITION
+import com.momiouo.naturequiz.tools.Const.NAVIGATION_PARAMETER_THEME
 import com.momiouo.naturequiz.tools.getActivityOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
+import fr.momiouo.naturequiz.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,9 +38,12 @@ class QuestionViewModel @Inject constructor(
 ) : ViewModel() {
 
     //TODO create arguments key constant in nav graph
-    private val selectedThemeId: StateFlow<String> = savedStateHandle.getStateFlow("themeId", "")
-    private val selectedLevelId: StateFlow<String> = savedStateHandle.getStateFlow("levelId", "")
-    private val selectedPositionId: StateFlow<Int> = savedStateHandle.getStateFlow("positionId", 0)
+    private val selectedThemeId: StateFlow<String> =
+        savedStateHandle.getStateFlow(NAVIGATION_PARAMETER_THEME, "")
+    private val selectedLevelId: StateFlow<String> =
+        savedStateHandle.getStateFlow(NAVIGATION_PARAMETER_LEVEL, "")
+    private val selectedPositionId: StateFlow<Int> =
+        savedStateHandle.getStateFlow(NAVIGATION_PARAMETER_POSITION, 0)
 
     private val _isQuestionAnswered = MutableStateFlow(false)
     val isQuestionAnswered = _isQuestionAnswered.asStateFlow()
@@ -52,9 +59,9 @@ class QuestionViewModel @Inject constructor(
                 selectedPositionId.value
             ), _isQuestionAnswered, _isAdLoading
         ) { question, isAnswered, isAdLoading ->
-            Log.d(
-                "QuestionViewModel",
-                "questionUiStateFlow() called with: question = $question, isAnswered = $isAnswered, isAdLoading = $isAdLoading"
+            if (BuildConfig.DEBUG) Log.d(
+                TAG,
+                "null() called with: question = $question, isAnswered = $isAnswered, isAdLoading = $isAdLoading"
             )
             if (question != null) {
                 QuestionUiState.Loaded(question.toQuestionUiModel(), isAnswered, isAdLoading)
@@ -74,9 +81,9 @@ class QuestionViewModel @Inject constructor(
 
     //TODO Add this logic in a repo then use case then here ...
     fun showInterstitialAd(context: Context, admobId: String, onAdFinished: () -> Unit) {
-        Log.d(
-            "QuestionViewModel",
-            "showInterstialAd() called with: context = $context, goToNextQuestion = $onAdFinished"
+        if (BuildConfig.DEBUG) Log.d(
+            TAG,
+            "showInterstitialAd() called with: context = $context, admobId = $admobId, onAdFinished = $onAdFinished"
         )
         _isAdLoading.update { true }
         val adCallBack = object : FullScreenContentCallback() {
@@ -92,14 +99,17 @@ class QuestionViewModel @Inject constructor(
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    Log.d("QuestionViewModel", "onAdFailedToLoad() called with: adError = $adError")
+                    if (BuildConfig.DEBUG) Log.d(
+                        TAG,
+                        "onAdFailedToLoad() called with: adError = $adError"
+                    )
                     onAdFinished()
                     _isAdLoading.update { false }
                 }
 
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    Log.d(
-                        "QuestionViewModel",
+                    if (BuildConfig.DEBUG) Log.d(
+                        TAG,
                         "onAdLoaded() called with: interstitialAd = $interstitialAd"
                     )
                     context.getActivityOrNull()?.let { interstitialAd.show(it) }
@@ -109,6 +119,10 @@ class QuestionViewModel @Inject constructor(
         )
 
 
+    }
+
+    companion object {
+        private const val TAG = "QuestionViewModel"
     }
 }
 

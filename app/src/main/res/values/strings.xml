@@ -20,5 +20,38 @@
     <string name="themes">Themes</string>
     <string name="menu_button_background">menu button background</string>
 
+    <string name="ai_quiz_theme">AI News Quiz ✨</string>
+    <string name="ai_quiz_subtitle">Generate quizzes from Futura Sciences &amp; eco sources</string>
+    <string name="ai_tab_generate">Create AI Quiz</string>
+    <string name="ai_tab_saved">Saved Quizzes (%1$d)</string>
+    <string name="ai_free_tries_badge">%1$d / %2$d free AI quizzes left</string>
+    <string name="ai_pro_active_badge">PRO Unlimited ✨</string>
+    <string name="ai_sources_label">Trusted Sources:</string>
+    <string name="ai_search_hint">Topic (e.g. Oceans, Solar, Biodiversity…)</string>
+    <string name="ai_search_button">🔍 Search Recent Articles</string>
+    <string name="ai_searching_articles">Searching recent articles with Gemini AI…</string>
+    <string name="ai_select_articles_prompt">Select 1 or more articles to generate your quiz (%1$d selected):</string>
+    <string name="ai_read_article">Read article ↗</string>
+    <string name="ai_generate_quiz_button">✨ Generate AI Quiz (%1$d selected)</string>
+    <string name="ai_generating_quiz">Gemini AI is crafting your quiz from the selected articles…</string>
+    <string name="ai_quiz_ready_title">Generated Quiz Ready!</string>
+    <string name="ai_save_quiz_button">💾 Save Locally</string>
+    <string name="ai_quiz_saved_badge">✅ Saved Locally</string>
+    <string name="ai_play_quiz_button">▶️ Play Quiz</string>
+    <string name="ai_no_saved_quizzes">No saved AI quizzes yet. Search articles and generate your first quiz!</string>
+    <string name="ai_questions_count">%1$d questions · %2$s</string>
+    <string name="ai_delete_quiz">Delete</string>
+    <string name="ai_api_key_note">Tip: Add GEMINI_API_KEY in local.properties for live Google Search grounding.</string>
+
+    <string name="paywall_title">Unlock Unlimited AI Quizzes ✨</string>
+    <string name="paywall_subtitle">You have used your %1$d free AI quiz generations!</string>
+    <string name="paywall_feature_1">✓ Unlimited AI quizzes from Futura Sciences, Nature, NASA &amp; Les Horizons</string>
+    <string name="paywall_feature_2">✓ Choose any recent environmental article or topic</string>
+    <string name="paywall_feature_3">✓ Save unlimited custom quizzes locally for offline play</string>
+    <string name="paywall_subscribe_button">Subscribe Monthly (%1$s/mo)</string>
+    <string name="paywall_default_price">4,99 €</string>
+    <string name="paywall_restore_button">Restore Subscription</string>
+    <string name="paywall_close_button">Maybe Later</string>
+    <string name="paywall_debug_unlock">Activate Test Subscription (Debug)</string>
 
 </resources>

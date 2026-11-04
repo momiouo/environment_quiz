@@ -1,9 +1,21 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.dagger.hilt.android)
     id("kotlin-kapt")
 }
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")
+    ?: System.getenv("GEMINI_API_KEY")
+    ?: ""
 
 android {
     namespace = "fr.momiouo.naturequiz"
@@ -13,13 +25,14 @@ android {
         applicationId = "fr.momiouo.naturequiz"
         minSdk = 29
         targetSdk = 34
-        versionCode = 104
-        versionName = "1.0"
+        versionCode = 105
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -74,6 +87,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose.android)
     implementation(libs.gms.play.services.ads)
+    implementation(libs.play.billing.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

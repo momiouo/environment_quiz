@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.momiouo.naturequiz.tools.Const
+import com.momiouo.naturequiz.tools.ThemeDbConverter
 import com.momiouo.naturequiz.ui.common.BackgroundImage
 import com.momiouo.naturequiz.ui.common.CustomLargeButton
 import com.momiouo.naturequiz.ui.theme.Orange
@@ -168,8 +169,9 @@ fun InGameScreenContent(
         ) {
 
             item {
+                val titleRes = ThemeDbConverter.getThemeTitleRes(themeId)
                 Text(
-                    text = themeId ?: "",
+                    text = if (titleRes != null) stringResource(titleRes) else (themeId ?: ""),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp, bottom = 10.dp),

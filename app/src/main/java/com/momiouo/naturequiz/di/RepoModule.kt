@@ -3,6 +3,7 @@ package com.momiouo.naturequiz.di
 import android.content.Context
 import com.momiouo.naturequiz.data.datasource.datastore.AppSharedPref
 import com.momiouo.naturequiz.data.datasource.db.AppDatabase
+import com.momiouo.naturequiz.data.datasource.remote.GeminiAiDataSource
 import com.momiouo.naturequiz.data.repository.QuestionRepositoryImpl
 import com.momiouo.naturequiz.domain.repository.QuestionRepository
 import dagger.Module
@@ -18,6 +19,7 @@ object RepoModule {
     fun providesQuestionRepository(
         @ApplicationContext context: Context,
         database: AppDatabase,
-        appSharedPref: AppSharedPref
-    ): QuestionRepository = QuestionRepositoryImpl(context, database, appSharedPref)
+        appSharedPref: AppSharedPref,
+        geminiAiDataSource: GeminiAiDataSource
+    ): QuestionRepository = QuestionRepositoryImpl(context, database, appSharedPref, geminiAiDataSource)
 }

@@ -2,6 +2,7 @@ package com.momiouo.naturequiz.ui.screens.menu
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.momiouo.naturequiz.tools.Const
 import dagger.hilt.android.lifecycle.HiltViewModel
 import fr.momiouo.naturequiz.R
 import javax.inject.Inject
@@ -12,6 +13,12 @@ class MenuViewModel @Inject constructor(
 ) : ViewModel() {
 
     val menuItemList = listOf(
+        ButtonTheme(
+            Const.AI_QUIZ_THEME_ID,
+            R.string.ai_quiz_theme,
+            R.drawable.randombackground,
+            10
+        ),
         ButtonTheme(
             1,
             R.string.les_bases,

@@ -21,4 +21,38 @@
     <string name="themes">Themes</string>
     <string name="menu_button_background">bouton menu image</string>
 
+    <string name="ai_quiz_theme">Quiz IA Actus ✨</string>
+    <string name="ai_quiz_subtitle">Créez des quiz depuis Futura Sciences et nos sources éco</string>
+    <string name="ai_tab_generate">Créer un Quiz IA</string>
+    <string name="ai_tab_saved">Quiz Sauvegardés (%1$d)</string>
+    <string name="ai_free_tries_badge">%1$d / %2$d essais IA gratuits restants</string>
+    <string name="ai_pro_active_badge">PRO Illimité ✨</string>
+    <string name="ai_sources_label">Sources fiables :</string>
+    <string name="ai_search_hint">Sujet (ex : Océans, Solaire, Biodiversité…)</string>
+    <string name="ai_search_button">🔍 Chercher des articles récents</string>
+    <string name="ai_searching_articles">Recherche d\'articles récents avec Gemini IA…</string>
+    <string name="ai_select_articles_prompt">Choisissez les articles pour générer votre quiz (%1$d sélectionné(s)) :</string>
+    <string name="ai_read_article">Lire l\'article ↗</string>
+    <string name="ai_generate_quiz_button">✨ Générer le Quiz IA (%1$d art.)</string>
+    <string name="ai_generating_quiz">Gemini IA génère votre quiz à partir des articles choisis…</string>
+    <string name="ai_quiz_ready_title">Quiz IA Prêt !</string>
+    <string name="ai_save_quiz_button">💾 Sauvegarder en local</string>
+    <string name="ai_quiz_saved_badge">✅ Sauvegardé en local</string>
+    <string name="ai_play_quiz_button">▶️ Jouer ce Quiz</string>
+    <string name="ai_no_saved_quizzes">Aucun quiz IA sauvegardé pour l\'instant. Cherchez des articles et générez votre premier quiz !</string>
+    <string name="ai_questions_count">%1$d questions · %2$s</string>
+    <string name="ai_delete_quiz">Supprimer</string>
+    <string name="ai_api_key_note">Astuce : Ajoutez GEMINI_API_KEY dans local.properties pour la recherche Google en direct.</string>
+
+    <string name="paywall_title">Quiz IA Illimités ✨</string>
+    <string name="paywall_subtitle">Vous avez utilisé vos %1$d générations de quiz IA gratuites !</string>
+    <string name="paywall_feature_1">✓ Quiz IA illimités depuis Futura Sciences, Nature, NASA et Les Horizons</string>
+    <string name="paywall_feature_2">✓ Choisissez vos articles récents ou sujets écologiques</string>
+    <string name="paywall_feature_3">✓ Sauvegardez tous vos quiz en local pour jouer hors-ligne</string>
+    <string name="paywall_subscribe_button">S\'abonner (%1$s/mois)</string>
+    <string name="paywall_default_price">4,99 €</string>
+    <string name="paywall_restore_button">Restaurer l\'abonnement</string>
+    <string name="paywall_close_button">Plus tard</string>
+    <string name="paywall_debug_unlock">Activer l\'abonnement test (Debug)</string>
+
 </resources>
