@@ -17,7 +17,7 @@ class MenuViewModel @Inject constructor(
             Const.AI_QUIZ_THEME_ID,
             R.string.ai_quiz_theme,
             R.drawable.randombackground,
-            10
+            140
         ),
         ButtonTheme(
             1,

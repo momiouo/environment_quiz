@@ -16,7 +16,7 @@ class ThemeDbConverter {
                 "5", "Digital", "digital" -> "digital"
                 "6", "Climate Change", "Changement Climatique", "climatechange" -> "climatechange"
                 "7", "Tri et Décomposition", "Sort And Decomposition", "Decomposition" -> "Decomposition"
-                "8", "Quiz IA", "AI Quiz", Const.AI_QUIZ_DB_THEME -> Const.AI_QUIZ_DB_THEME
+                "8", "Quiz IA", "AI Quiz", "Generate Your Quiz", "Générer votre Quiz", Const.AI_QUIZ_DB_THEME -> Const.AI_QUIZ_DB_THEME
                 else -> null
             }
         }
@@ -30,7 +30,7 @@ class ThemeDbConverter {
                 "5", "digital", "Digital" -> R.string.digital
                 "6", "climatechange", "Climate Change", "Changement Climatique" -> R.string.climate_change
                 "7", "Decomposition", "Tri et Décomposition", "Sort And Decomposition" -> R.string.le_tri_et_la_d_composition
-                "8", Const.AI_QUIZ_DB_THEME, "Quiz IA", "AI Quiz" -> R.string.ai_quiz_theme
+                "8", Const.AI_QUIZ_DB_THEME, "Quiz IA", "AI Quiz", "Generate Your Quiz", "Générer votre Quiz" -> R.string.ai_quiz_theme
                 else -> null
             }
         }

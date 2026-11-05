@@ -6,7 +6,9 @@ data class ArticleItem(
     val sourceName: String,
     val url: String,
     val summary: String,
-    val publishedDate: String
+    val publishedDate: String,
+    val themeTag: String = "general",
+    val curatedQuestions: List<Question> = emptyList()
 )
 
 data class GeneratedAiQuiz(

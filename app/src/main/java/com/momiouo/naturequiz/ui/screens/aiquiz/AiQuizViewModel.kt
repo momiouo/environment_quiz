@@ -5,7 +5,6 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.momiouo.naturequiz.data.billing.BillingManager
-import com.momiouo.naturequiz.data.datasource.remote.GeminiAiDataSource
 import com.momiouo.naturequiz.domain.model.ArticleItem
 import com.momiouo.naturequiz.domain.model.GeneratedAiQuiz
 import com.momiouo.naturequiz.domain.model.SavedAiQuiz
@@ -22,9 +21,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class AiQuizUiState(
-    val searchQuery: String = "",
-    val availableSources: List<String> = GeminiAiDataSource.DEFAULT_SOURCES,
-    val selectedSources: Set<String> = GeminiAiDataSource.DEFAULT_SOURCES.toSet(),
+    val selectedThemeTag: String = THEME_ALL,
     val articles: List<ArticleItem> = emptyList(),
     val selectedArticleIds: Set<String> = emptySet(),
     val isSearchingArticles: Boolean = false,
@@ -35,7 +32,14 @@ data class AiQuizUiState(
     val remainingFreeTries: Int = Const.MAX_FREE_AI_QUIZ_TRIES,
     val showPaywallDialog: Boolean = false,
     val isApiKeyConfigured: Boolean = false
-)
+) {
+    val filteredArticles: List<ArticleItem>
+        get() = articles
+
+    companion object {
+        const val THEME_ALL = "all"
+    }
+}
 
 @HiltViewModel
 class AiQuizViewModel @Inject constructor(
@@ -57,23 +61,20 @@ class AiQuizViewModel @Inject constructor(
 
     init {
         billingManager.startBillingConnection()
-        searchArticles()
+        loadArticlesForTheme(AiQuizUiState.THEME_ALL)
     }
 
-    fun onSearchQueryChanged(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-    }
-
-    fun toggleSource(source: String) {
-        _uiState.update { state ->
-            val updated = state.selectedSources.toMutableSet()
-            if (updated.contains(source)) {
-                if (updated.size > 1) updated.remove(source)
-            } else {
-                updated.add(source)
-            }
-            state.copy(selectedSources = updated)
+    fun selectTheme(themeTag: String) {
+        if (_uiState.value.selectedThemeTag.equals(themeTag, ignoreCase = true) && _uiState.value.articles.isNotEmpty()) {
+            return
         }
+        _uiState.update {
+            it.copy(
+                selectedThemeTag = themeTag,
+                selectedArticleIds = emptySet()
+            )
+        }
+        loadArticlesForTheme(themeTag)
     }
 
     fun toggleArticleSelection(articleId: String) {
@@ -88,24 +89,20 @@ class AiQuizViewModel @Inject constructor(
         }
     }
 
-    fun searchArticles() {
-        val currentState = _uiState.value
-        if (currentState.isSearchingArticles) return
-
+    fun loadArticlesForTheme(themeTag: String = _uiState.value.selectedThemeTag) {
         val language = Locale.current.language
         _uiState.update { it.copy(isSearchingArticles = true) }
 
         viewModelScope.launch {
             val foundArticles = repository.searchArticles(
-                topicQuery = currentState.searchQuery,
-                selectedSources = currentState.selectedSources.toList(),
+                topicQuery = themeTag,
+                selectedSources = emptyList(),
                 language = language
             )
-            val preselectedIds = foundArticles.take(2).map { it.id }.toSet()
             _uiState.update {
                 it.copy(
                     articles = foundArticles,
-                    selectedArticleIds = preselectedIds,
+                    selectedArticleIds = emptySet(),
                     isSearchingArticles = false
                 )
             }
@@ -130,8 +127,6 @@ class AiQuizViewModel @Inject constructor(
         }
 
         val chosenArticles = state.articles.filter { state.selectedArticleIds.contains(it.id) }
-            .ifEmpty { state.articles.take(2) }
-
         if (chosenArticles.isEmpty()) return
 
         val language = Locale.current.language
@@ -234,7 +229,6 @@ class AiQuizViewModel @Inject constructor(
         billingManager.launchSubscriptionFlow(
             activity = activity,
             onStoreProductNotReady = {
-                // If Play Store billing is not yet live in test environment, keep dialog open or allow test unlock in debug
             }
         )
     }
