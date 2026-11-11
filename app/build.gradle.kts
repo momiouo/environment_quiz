@@ -22,13 +22,13 @@ val serpApiKey: String = localProperties.getProperty("SERPAPI_API_KEY")
 
 android {
     namespace = "fr.momiouo.naturequiz"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "fr.momiouo.naturequiz"
         minSdk = 29
-        targetSdk = 34
-        versionCode = 105
+        targetSdk = 36
+        versionCode = 106
         versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -55,6 +55,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf("-Xskip-metadata-version-check")
     }
     buildFeatures {
         compose = true

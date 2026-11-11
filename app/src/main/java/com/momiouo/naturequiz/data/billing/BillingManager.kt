@@ -86,9 +86,9 @@ class BillingManager @Inject constructor(
             .setProductList(productList)
             .build()
 
-        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, queryProductDetailsResult ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                val details = productDetailsList.firstOrNull()
+                val details = queryProductDetailsResult.productDetailsList.firstOrNull()
                 subscriptionProductDetails = details
                 val bestOffer = getBestSubscriptionOffer(details)
                 val recurringPhase = bestOffer?.pricingPhases?.pricingPhaseList?.firstOrNull { it.priceAmountMicros > 0 }
