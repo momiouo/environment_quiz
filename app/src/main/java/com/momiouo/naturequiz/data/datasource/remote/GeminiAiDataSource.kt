@@ -114,7 +114,7 @@ class GeminiAiDataSource @Inject constructor(
         if (apiKey.isNotEmpty() && articles.isNotEmpty()) {
             try {
                 val prompt = buildQuizGenerationPrompt(articles, isFrench)
-                val responseJson = callGeminiWithSearchGrounding(prompt)
+                val responseJson = callGeminiForQuiz(prompt)
                 val parsedQuiz = parseQuizFromGeminiResponse(responseJson, articles, isFrench)
                 if (parsedQuiz != null && parsedQuiz.questions.isNotEmpty()) {
                     quizCache[cacheKey] = parsedQuiz
@@ -253,8 +253,85 @@ class GeminiAiDataSource @Inject constructor(
         }
     }
 
+    private fun callGeminiForQuiz(prompt: String): JSONObject {
+        val modelsToTry = listOf("gemini-3.8-flash", "gemini-flash-latest")
+        var lastException: Exception? = null
+
+        for (modelName in modelsToTry) {
+            try {
+                val endpoint =
+                    "https://generativelanguage.googleapis.com/v1beta/models/$modelName:generateContent?key=$apiKey"
+                val url = URL(endpoint)
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    connectTimeout = 15_000
+                    readTimeout = 40_000
+                    doOutput = true
+                    setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                }
+
+                val payload = JSONObject().apply {
+                    put(
+                        "contents",
+                        JSONArray().put(
+                            JSONObject().apply {
+                                put(
+                                    "parts",
+                                    JSONArray().put(JSONObject().put("text", prompt))
+                                )
+                            }
+                        )
+                    )
+                    // Guaranteed valid JSON, direct output with 0 thinking token latency
+                    put(
+                        "generationConfig",
+                        JSONObject().apply {
+                            put("responseMimeType", "application/json")
+                            put("temperature", 0.3)
+                            put("maxOutputTokens", 3000)
+                            put(
+                                "thinkingConfig",
+                                JSONObject().apply {
+                                    put("thinkingBudget", 0)
+                                }
+                            )
+                        }
+                    )
+                }
+
+                OutputStreamWriter(connection.outputStream, Charsets.UTF_8).use { writer ->
+                    writer.write(payload.toString())
+                    writer.flush()
+                }
+
+                val responseCode = connection.responseCode
+                val stream = if (responseCode in 200..299) {
+                    connection.inputStream
+                } else {
+                    connection.errorStream
+                }
+
+                val responseBody = BufferedReader(InputStreamReader(stream, Charsets.UTF_8)).use {
+                    it.readText()
+                }
+
+                if (responseCode in 200..299) {
+                    return JSONObject(responseBody)
+                } else {
+                    Log.w(TAG, "callGeminiForQuiz: model $modelName returned HTTP $responseCode: $responseBody")
+                    lastException = IllegalStateException("HTTP $responseCode: $responseBody")
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "callGeminiForQuiz: model $modelName failed: ${e.message}")
+                lastException = e
+            }
+        }
+
+        throw lastException ?: IllegalStateException("Gemini API quiz generation request failed")
+    }
+
     private fun callGeminiWithSearchGrounding(prompt: String): JSONObject {
-        val modelsToTry = listOf("gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash")
+        val modelsToTry = listOf("gemini-3.8-flash", "gemini-flash-latest")
         var lastException: Exception? = null
 
         for (modelName in modelsToTry) {
@@ -265,7 +342,7 @@ class GeminiAiDataSource @Inject constructor(
                 val connection = (url.openConnection() as HttpURLConnection).apply {
                     requestMethod = "POST"
                     connectTimeout = 20_000
-                    readTimeout = 30_000
+                    readTimeout = 40_000
                     doOutput = true
                     setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 }
@@ -321,6 +398,7 @@ class GeminiAiDataSource @Inject constructor(
                     lastException = IllegalStateException("HTTP $responseCode: $responseBody")
                 }
             } catch (e: Exception) {
+                Log.d(TAG, "callGeminiWithSearchGrounding: modelTried:$modelName exception:$e")
                 lastException = e
             }
         }
@@ -412,8 +490,17 @@ class GeminiAiDataSource @Inject constructor(
         isFrench: Boolean
     ): GeneratedAiQuiz? {
         val rawText = extractCandidateText(responseJson)
-        val jsonObjStr = extractJsonSubstring(rawText, '{', '}') ?: return null
-        val root = JSONObject(jsonObjStr)
+        val jsonObjStr = extractJsonSubstring(rawText, '{', '}') ?: rawText.trim()
+        val root = try {
+            JSONObject(jsonObjStr)
+        } catch (e: Exception) {
+            try {
+                JSONObject(rawText.trim())
+            } catch (e2: Exception) {
+                Log.e(TAG, "parseQuizFromGeminiResponse: JSON parse error", e2)
+                return null
+            }
+        }
 
         val defaultTitle = if (isFrench) {
             "Quiz : ${sourceArticles.firstOrNull()?.title?.take(32) ?: "Nature & Science"}"
