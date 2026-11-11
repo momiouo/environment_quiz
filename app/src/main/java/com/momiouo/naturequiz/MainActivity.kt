@@ -11,12 +11,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.momiouo.naturequiz.data.billing.BillingManager
 import com.momiouo.naturequiz.ui.navigation.AppNavHost
 import com.momiouo.naturequiz.ui.theme.NatureQuizTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var billingManager: BillingManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,5 +40,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        billingManager.queryActiveSubscriptions()
     }
 }

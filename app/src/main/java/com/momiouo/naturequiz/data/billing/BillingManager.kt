@@ -140,7 +140,10 @@ class BillingManager @Inject constructor(
     }
 
     fun queryActiveSubscriptions() {
-        if (!billingClient.isReady) return
+        if (!billingClient.isReady) {
+            startBillingConnection()
+            return
+        }
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -156,9 +159,7 @@ class BillingManager @Inject constructor(
                         acknowledgePurchase(purchase)
                     }
                 }
-                if (hasActiveSub) {
-                    setSubscribedState(true)
-                }
+                setSubscribedState(hasActiveSub)
             }
         }
     }

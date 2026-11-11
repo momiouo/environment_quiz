@@ -61,6 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.momiouo.naturequiz.domain.model.AiQuizErrorSource
 import com.momiouo.naturequiz.domain.model.ArticleItem
@@ -113,7 +115,7 @@ fun AiQuizScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val hasReachedLimit = !isSubscribed && uiState.remainingFreeTries <= 0
 
-    LaunchedEffect(Unit) {
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.refreshState()
     }
 

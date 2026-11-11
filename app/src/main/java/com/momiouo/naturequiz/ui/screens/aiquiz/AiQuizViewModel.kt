@@ -78,6 +78,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun refreshState() {
+        billingManager.queryActiveSubscriptions()
         _uiState.update {
             it.copy(
                 savedQuizzes = repository.getSavedAiQuizzes(),
