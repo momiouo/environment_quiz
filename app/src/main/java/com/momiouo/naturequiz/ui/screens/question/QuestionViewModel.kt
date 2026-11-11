@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import com.momiouo.naturequiz.domain.repository.QuestionRepository
+import com.momiouo.naturequiz.tools.Const
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +37,7 @@ class QuestionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getQuestionUseCase: GetQuestionUseCase,
     private val saveIsGoodAnswerUseCase: SaveIsGoodAnswerUseCase,
+    private val repository: QuestionRepository
 ) : ViewModel() {
 
     //TODO create arguments key constant in nav graph
@@ -44,6 +47,37 @@ class QuestionViewModel @Inject constructor(
         savedStateHandle.getStateFlow(NAVIGATION_PARAMETER_LEVEL, "")
     private val selectedPositionId: StateFlow<Int> =
         savedStateHandle.getStateFlow(NAVIGATION_PARAMETER_POSITION, 0)
+
+    val customQuizTitle: String? by lazy {
+        if (selectedThemeId.value == Const.AI_QUIZ_DB_THEME) {
+            val levelInt = selectedLevelId.value.toIntOrNull() ?: 0
+            val savedQuiz = repository.getSavedAiQuizByLevel(levelInt)
+            savedQuiz?.let { cleanShortQuizTitle(it.articleTitle.ifBlank { it.title }) }
+        } else {
+            null
+        }
+    }
+
+    private fun cleanShortQuizTitle(title: String): String {
+        var clean = title.trim()
+        if (clean.startsWith("Quiz : ", ignoreCase = true)) clean = clean.substring(7).trim()
+        if (clean.startsWith("Quiz: ", ignoreCase = true)) clean = clean.substring(6).trim()
+
+        val colonIdx = clean.indexOf(':')
+        if (colonIdx in 3..25) {
+            clean = clean.substring(0, colonIdx).trim()
+        } else {
+            val dashIdx = clean.indexOf('-')
+            if (dashIdx in 3..25) {
+                clean = clean.substring(0, dashIdx).trim()
+            }
+        }
+
+        if (clean.length > 26) {
+            clean = clean.take(24).trimEnd() + "…"
+        }
+        return "Quiz : $clean"
+    }
 
     private val _isQuestionAnswered = MutableStateFlow(false)
     val isQuestionAnswered = _isQuestionAnswered.asStateFlow()

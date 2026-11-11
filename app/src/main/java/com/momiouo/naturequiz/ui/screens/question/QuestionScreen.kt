@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -126,16 +127,17 @@ fun QuestionScreen(
     ) {
         when (val questionState = questionUiState) {
             is QuestionUiState.Loaded -> InGameScreenContent(
-                themeId,
-                questionState.question,
-                questionState.isAnswered,
-                positionId,
-                isClueVisible,
-                questionState.isAdLoading,
-                saveIsGoodAnswer,
-                decideButtonColor,
-                onHintClicked,
-                removeClue
+                themeId = themeId,
+                customTitle = questionViewModel.customQuizTitle,
+                question = questionState.question,
+                isAnswered = questionState.isAnswered,
+                positionId = positionId,
+                isClueVisible = isClueVisible,
+                isAdLoading = questionState.isAdLoading,
+                saveIsGoodAnswer = saveIsGoodAnswer,
+                decideButtonColor = decideButtonColor,
+                onHintClicked = onHintClicked,
+                removeClue = removeClue
             )
 
             QuestionUiState.Loading, QuestionUiState.Finished -> Text(text = stringResource(id = R.string.loading))
@@ -146,6 +148,7 @@ fun QuestionScreen(
 @Composable
 fun InGameScreenContent(
     themeId: String?,
+    customTitle: String? = null,
     question: QuestionUiModel?,
     isAnswered: Boolean,
     positionId: Int?,
@@ -170,14 +173,19 @@ fun InGameScreenContent(
 
             item {
                 val titleRes = ThemeDbConverter.getThemeTitleRes(themeId)
+                val displayTitle = customTitle
+                    ?: if (titleRes != null) stringResource(titleRes) else (themeId ?: "")
+
                 Text(
-                    text = if (titleRes != null) stringResource(titleRes) else (themeId ?: ""),
+                    text = displayTitle,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp, bottom = 10.dp),
+                        .padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.White
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 30.sp),
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -289,17 +297,30 @@ fun LeafQuestionFrame(modifier: Modifier = Modifier, question: QuestionUiModel?,
             modifier = modifier.height(200.dp)
         )
 
-        //QUESTION BODY
+        val questionText = question?.question ?: ""
+        val questionFontSize = when {
+            questionText.length > 120 -> 16.sp
+            questionText.length > 80 -> 19.sp
+            questionText.length > 50 -> 22.sp
+            else -> 26.sp
+        }
+        val questionLineHeight = (questionFontSize.value * 1.25).sp
+
+        //QUESTION BODY (auto-scaled typography and maxLines to avoid text overflow)
         Text(
-            text = question?.question ?: "",
+            text = questionText,
             modifier = Modifier
-                .padding(start = 30.dp, top = 5.dp, end = 30.dp, bottom = 10.dp),
-            style = MaterialTheme.typography.bodyLarge,
+                .padding(start = 36.dp, top = 8.dp, end = 36.dp, bottom = 10.dp),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = questionFontSize,
+                lineHeight = questionLineHeight
+            ),
             color = Color.White,
+            textAlign = TextAlign.Center,
+            maxLines = 5,
+            overflow = TextOverflow.Ellipsis
         )
-
     }
-
 }
 
 //TODO In V2

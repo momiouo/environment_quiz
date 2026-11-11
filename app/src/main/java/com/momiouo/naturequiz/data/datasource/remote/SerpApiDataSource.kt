@@ -12,6 +12,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,6 +20,15 @@ import javax.inject.Singleton
 class SerpApiDataSource @Inject constructor() {
 
     private val apiKey: String = BuildConfig.SERPAPI_API_KEY.trim()
+
+    private data class CachedSearch(
+        val articles: List<ArticleItem>,
+        val timestamp: Long
+    )
+
+    // In-memory cache to eliminate redundant SerpApi requests and minimize costs
+    private val searchCache = ConcurrentHashMap<String, CachedSearch>()
+    private val CACHE_TTL_MS = 60 * 60 * 1000L // 1 hour TTL
 
     fun isConfigured(): Boolean = apiKey.isNotEmpty()
 
@@ -31,6 +41,15 @@ class SerpApiDataSource @Inject constructor() {
         }
 
         val isFrench = language.lowercase().startsWith("fr")
+        val cacheKey = "${themeTag.lowercase().trim()}_${if (isFrench) "fr" else "en"}"
+        val now = System.currentTimeMillis()
+
+        // Check cache before calling external API
+        val cached = searchCache[cacheKey]
+        if (cached != null && (now - cached.timestamp < CACHE_TTL_MS)) {
+            return@withContext cached.articles
+        }
+
         val gl = if (isFrench) "fr" else "us"
         val hl = if (isFrench) "fr" else "en"
         val query = getSearchQuery(themeTag, isFrench)
@@ -46,11 +65,13 @@ class SerpApiDataSource @Inject constructor() {
                 isFrench = isFrench
             )
             if (newsArticles.isNotEmpty()) {
-                return@withContext newsArticles
+                val limited = newsArticles.take(8)
+                searchCache[cacheKey] = CachedSearch(limited, now)
+                return@withContext limited
             }
 
             // Fallback to Google Search with news filter
-            return@withContext querySerpApi(
+            val organicNews = querySerpApi(
                 engine = "google",
                 query = query,
                 gl = gl,
@@ -59,6 +80,12 @@ class SerpApiDataSource @Inject constructor() {
                 isFrench = isFrench,
                 extraParam = "&tbm=nws"
             )
+            if (organicNews.isNotEmpty()) {
+                val limited = organicNews.take(8)
+                searchCache[cacheKey] = CachedSearch(limited, now)
+                return@withContext limited
+            }
+            emptyList()
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) {
                 Log.e(TAG, "SerpApi search failed for theme: $themeTag", e)
@@ -162,6 +189,12 @@ class SerpApiDataSource @Inject constructor() {
 
         val date = item.optString("date").ifBlank { if (isFrench) "Récent" else "Recent" }
 
+        val thumbnail = item.optString("thumbnail")
+            .ifBlank { item.optJSONObject("thumbnail")?.optString("src") ?: "" }
+            .ifBlank { item.optString("image") }
+            .ifBlank { item.optJSONObject("image")?.optString("src") ?: "" }
+            .ifBlank { getDefaultThumbnailForTheme(themeTag) }
+
         return ArticleItem(
             id = UUID.randomUUID().toString(),
             title = cleanTitle,
@@ -169,12 +202,28 @@ class SerpApiDataSource @Inject constructor() {
             url = link,
             summary = snippet.ifBlank { cleanTitle },
             publishedDate = date,
-            themeTag = themeTag
+            themeTag = themeTag,
+            imageUrl = thumbnail
         )
     }
 
-    private fun getSearchQuery(themeTag: String, isFrench: Boolean): String {
+    private fun getDefaultThumbnailForTheme(themeTag: String): String {
         return when (themeTag.lowercase()) {
+            "oceans" -> "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80"
+            "animaux", "wildlife" -> "https://images.unsplash.com/photo-1564349683136-77e08dba1ef6?w=400&q=80"
+            "energies", "energy" -> "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400&q=80"
+            "forets", "forests" -> "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=80"
+            "climat", "climate" -> "https://images.unsplash.com/photo-1483086431886-3590a88317fd?w=400&q=80"
+            "espace", "space" -> "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80"
+            "dechets", "waste", "recycling" -> "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=400&q=80"
+            else -> "https://images.unsplash.com/photo-1511497584788-87676104235f?w=400&q=80"
+        }
+    }
+
+    private fun getSearchQuery(themeTag: String, isFrench: Boolean): String {
+        val tag = themeTag.lowercase().trim()
+        return when (tag) {
+            "all", "tous", "custom", "" -> if (isFrench) "environnement nature science Futura Sciences" else "nature environment science NASA Nature"
             "oceans" -> if (isFrench) "océans biodiversité marine coraux science" else "oceans marine life marine biology coral science"
             "animaux", "wildlife" -> if (isFrench) "animaux faune sauvage biodiversité nature" else "wildlife animals conservation nature biodiversity"
             "energies", "energy" -> if (isFrench) "énergies renouvelables transition écologique solaire éolien" else "renewable energy solar wind clean energy transition"
@@ -182,7 +231,7 @@ class SerpApiDataSource @Inject constructor() {
             "climat", "climate" -> if (isFrench) "climat réchauffement climatique cop météorologie" else "climate change global warming emissions atmosphere"
             "espace", "space" -> if (isFrench) "espace astronomie télescope nasa esa univers" else "space astronomy NASA ESA telescope cosmos"
             "dechets", "waste", "recycling" -> if (isFrench) "déchets recyclage pollution plastique économie circulaire" else "waste recycling plastic pollution circular economy"
-            else -> if (isFrench) "environnement nature science Futura Sciences" else "nature environment science NASA Nature"
+            else -> "$themeTag ${if (isFrench) "science nature Futura" else "science nature"}"
         }
     }
 

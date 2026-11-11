@@ -58,11 +58,9 @@ fun AppNavHost() {
                 },
                 navigateToPlayQuiz = { theme, level ->
                     val initialPosition = 0
+                    // Retain AiQuizScreen on the backstack so previous search/quiz history is preserved
                     navController.navigate(
-                        route = Screen.QuestionScreen.route + "/$theme&$level&$initialPosition",
-                        navOptions = NavOptions.Builder()
-                            .setPopUpTo(Screen.MenuScreen.route, false)
-                            .build()
+                        route = Screen.QuestionScreen.route + "/$theme&$level&$initialPosition"
                     )
                 }
             )
@@ -155,12 +153,25 @@ fun AppNavHost() {
                 theme = themeId ?: "",
                 level = levelId ?: "",
                 navigateToMenuScreen = {
-                    navController.navigate(
-                        route = Screen.MenuScreen.route,
-                        navOptions = NavOptions.Builder()
-                            .setPopUpTo(Screen.MenuScreen.route, false)
-                            .build()
-                    )
+                    if (themeId == Const.AI_QUIZ_DB_THEME) {
+                        // Return directly to AiQuizScreen, preserving its exact state and history
+                        val popped = navController.popBackStack(Screen.AiQuizScreen.route, false)
+                        if (!popped) {
+                            navController.navigate(
+                                route = Screen.AiQuizScreen.route,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(Screen.MenuScreen.route, false)
+                                    .build()
+                            )
+                        }
+                    } else {
+                        navController.navigate(
+                            route = Screen.MenuScreen.route,
+                            navOptions = NavOptions.Builder()
+                                .setPopUpTo(Screen.MenuScreen.route, false)
+                                .build()
+                        )
+                    }
                 },
                 navigateToQuestionScreen = { theme, level ->
                     navController.navigate(

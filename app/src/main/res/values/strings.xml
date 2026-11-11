@@ -47,13 +47,14 @@
     <string name="ai_limit_reached_desc">You have used your free generations. Subscribe to unlock unlimited quiz generation!</string>
     <string name="ai_limit_reached_header">✨ Limit Reached ✨</string>
     <string name="ai_limit_reached_tries">You have used your 3 free quizzes!</string>
-    <string name="ai_limit_reached_message">Subscribe to generate unlimited quizzes from live science news: Futura Sciences, Nature, NASA and reliable eco sources!</string>
-    <string name="ai_subscribe_monthly_format">Subscribe (%1$s/month)</string>
+    <string name="ai_limit_reached_message">Subscribe to generate unlimited quizzes from live science news: Futura Sciences, Nature, NASA and reliable eco sources! Enjoy a 7-day free trial, cancel anytime.</string>
+    <string name="ai_subscribe_monthly_format">Start 7-Day Free Trial (%1$s/mo)</string>
     <string name="ai_loading_articles">Loading latest articles…</string>
     <string name="ai_subscribe_now">Subscribe for Unlimited</string>
     <string name="ai_api_key_note">Tip: Add GEMINI_API_KEY in local.properties for live Google Search grounding.</string>
 
     <string name="ai_theme_all">All</string>
+    <string name="ai_theme_custom">🔎 Custom</string>
     <string name="ai_theme_oceans">🌊 Oceans</string>
     <string name="ai_theme_animals">🐾 Wildlife</string>
     <string name="ai_theme_energy">⚡ Clean Energy</string>
@@ -62,13 +63,38 @@
     <string name="ai_theme_space">🛰️ Space</string>
     <string name="ai_theme_waste">♻️ Recycling</string>
 
+    <string name="ai_custom_search_hint">Search any topic (e.g. solar energy, volcanoes…)</string>
+    <string name="ai_custom_search_button">Search</string>
+    <string name="ai_custom_empty_hint">Type any custom topic above to find recent articles and generate your quiz!</string>
+    <string name="ai_articles_error_generic">Unable to load articles. Please check your internet connection and try again.</string>
+    <string name="ai_articles_retry">Retry</string>
+
+    <string name="error_no_internet_title">No Internet Connection</string>
+    <string name="error_no_internet_desc">Please check your Wi-Fi or mobile network and try again.</string>
+    <string name="error_search_service_title">Search Engine Unavailable</string>
+    <string name="error_search_service_desc">Unable to retrieve recent science articles. Please try again or refine your search keywords.</string>
+    <string name="error_ai_service_title">AI Generation Busy</string>
+    <string name="error_ai_service_desc">Google Gemini AI is currently busy or experiencing high traffic. Please try again in a few seconds.</string>
+    <string name="error_general_title">Generation Error</string>
+    <string name="error_general_desc">An unexpected error occurred while creating your quiz. Please try again.</string>
+
+    <string name="billing_not_ready_message">Connecting to Google Play Store. Please try again in a moment.</string>
+
+    <string name="end_source_article_title">Original Article</string>
+    <string name="end_read_article">Read Article ↗</string>
+    <string name="end_share_button">🌟 Share Quiz Score</string>
+    <string name="end_share_chooser_title">Share your score via…</string>
+    <string name="end_share_picker_message">I scored %1$d%% on the \'%2$s\' quiz in Environment Quiz! 🌿 Try it out here: %3$s | Article: %4$s</string>
+    <string name="end_share_picker_message_general">I scored %1$d%% on Environment Quiz! 🌿 Test your environmental knowledge here: %2$s</string>
+
     <string name="paywall_title">Unlock Unlimited AI Quizzes ✨</string>
-    <string name="paywall_subtitle">You have used your %1$d free AI quiz generations!</string>
+    <string name="paywall_subtitle">Enjoy a 7-day free trial, then only %1$s/month. Cancel anytime!</string>
+    <string name="paywall_feature_trial">🎁 7-Day 100% Free Trial</string>
     <string name="paywall_feature_1">✓ Unlimited AI quizzes from Futura Sciences, Nature, NASA &amp; Les Horizons</string>
     <string name="paywall_feature_2">✓ Choose any recent environmental article or topic</string>
     <string name="paywall_feature_3">✓ Save unlimited custom quizzes locally for offline play</string>
-    <string name="paywall_subscribe_button">Subscribe Monthly (%1$s/mo)</string>
-    <string name="paywall_default_price">4,99 €</string>
+    <string name="paywall_subscribe_button">Start 7-Day Free Trial (%1$s/mo)</string>
+    <string name="paywall_default_price">0.99 €</string>
     <string name="paywall_restore_button">Restore Subscription</string>
     <string name="paywall_close_button">Maybe Later</string>
     <string name="paywall_debug_unlock">Activate Test Subscription (Debug)</string>

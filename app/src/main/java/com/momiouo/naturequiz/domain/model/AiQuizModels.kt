@@ -8,6 +8,7 @@ data class ArticleItem(
     val summary: String,
     val publishedDate: String,
     val themeTag: String = "general",
+    val imageUrl: String = "",
     val curatedQuestions: List<Question> = emptyList()
 )
 
@@ -22,5 +23,21 @@ data class SavedAiQuiz(
     val title: String,
     val sourcesSummary: String,
     val createdAt: String,
-    val questionCount: Int
+    val questionCount: Int,
+    val articleTitle: String = "",
+    val articleUrl: String = "",
+    val articleImageUrl: String = ""
 )
+
+enum class AiQuizErrorSource {
+    NO_INTERNET,
+    AI_SERVICE,
+    SEARCH_SERVICE,
+    UNKNOWN
+}
+
+class AiQuizException(
+    val errorSource: AiQuizErrorSource,
+    message: String? = null,
+    cause: Throwable? = null
+) : Exception(message, cause)

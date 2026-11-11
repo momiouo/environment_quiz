@@ -134,12 +134,16 @@ class QuestionRepositoryImpl @Inject constructor(
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
         val sourcesSummary = quiz.sourceArticles.map { it.sourceName }.distinct().joinToString(", ")
             .ifEmpty { "Futura Sciences" }
+        val primaryArticle = quiz.sourceArticles.firstOrNull()
         val savedQuiz = SavedAiQuiz(
             levelId = nextLevel,
             title = quiz.title,
             sourcesSummary = sourcesSummary,
             createdAt = dateFormat.format(Date()),
-            questionCount = quiz.questions.size
+            questionCount = quiz.questions.size,
+            articleTitle = primaryArticle?.title ?: quiz.title,
+            articleUrl = primaryArticle?.url ?: "",
+            articleImageUrl = primaryArticle?.imageUrl ?: ""
         )
         appSharedPref.addSavedAiQuiz(savedQuiz)
         return savedQuiz
@@ -147,6 +151,10 @@ class QuestionRepositoryImpl @Inject constructor(
 
     override fun getSavedAiQuizzes(): List<SavedAiQuiz> {
         return appSharedPref.getSavedAiQuizzes()
+    }
+
+    override fun getSavedAiQuizByLevel(levelId: Int): SavedAiQuiz? {
+        return appSharedPref.getSavedAiQuizByLevel(levelId)
     }
 
     override suspend fun deleteSavedAiQuiz(levelId: Int) {

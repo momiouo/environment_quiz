@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +13,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,15 +27,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -43,9 +50,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.momiouo.naturequiz.domain.model.AiQuizErrorSource
 import com.momiouo.naturequiz.domain.model.ArticleItem
 import com.momiouo.naturequiz.domain.model.GeneratedAiQuiz
 import com.momiouo.naturequiz.domain.model.SavedAiQuiz
@@ -103,12 +113,22 @@ fun AiQuizScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val hasReachedLimit = !isSubscribed && uiState.remainingFreeTries <= 0
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshState()
+    }
+
+    val onSubscribeWithFeedback: () -> Unit = {
+        viewModel.subscribeMonthly(context.getActivityOrNull(), onNotReady = {
+            Toast.makeText(context, context.getString(R.string.billing_not_ready_message), Toast.LENGTH_SHORT).show()
+        })
+    }
+
     BackgroundImage(backgroundResource = R.drawable.our_mainbg) {
         // Requirement 1: If free quiz limit reached, do NOT load anything and just show the dedicated limit screen!
         if (hasReachedLimit) {
             LimitReachedScreen(
                 priceText = formattedPrice ?: stringResource(R.string.paywall_default_price),
-                onSubscribeClick = { viewModel.subscribeMonthly(context.getActivityOrNull()) },
+                onSubscribeClick = onSubscribeWithFeedback,
                 onRestoreClick = viewModel::restoreSubscription,
                 onDebugUnlockClick = viewModel::activateDebugSubscription,
                 navigateBack = navigateBack
@@ -174,6 +194,9 @@ fun AiQuizScreen(
                     CreateQuizContent(
                         uiState = uiState,
                         onSelectTheme = viewModel::selectTheme,
+                        onCustomQueryChange = viewModel::onCustomQueryChange,
+                        onPerformCustomSearch = viewModel::searchCustomArticles,
+                        onRetryLoadArticles = viewModel::retryLoadArticles,
                         onToggleArticle = viewModel::toggleArticleSelection,
                         onGenerateClicked = viewModel::generateQuizFromSelectedArticles,
                         onSaveQuizClicked = viewModel::saveCurrentQuizLocally,
@@ -199,9 +222,7 @@ fun AiQuizScreen(
         if (uiState.showPaywallDialog) {
             AiPaywallDialog(
                 priceText = formattedPrice ?: stringResource(R.string.paywall_default_price),
-                onSubscribeClick = {
-                    viewModel.subscribeMonthly(context.getActivityOrNull())
-                },
+                onSubscribeClick = onSubscribeWithFeedback,
                 onRestoreClick = viewModel::restoreSubscription,
                 onDebugUnlockClick = viewModel::activateDebugSubscription,
                 onDismiss = viewModel::dismissPaywall
@@ -346,6 +367,9 @@ private fun TabPill(
 private fun CreateQuizContent(
     uiState: AiQuizUiState,
     onSelectTheme: (String) -> Unit,
+    onCustomQueryChange: (String) -> Unit,
+    onPerformCustomSearch: (String) -> Unit,
+    onRetryLoadArticles: () -> Unit,
     onToggleArticle: (String) -> Unit,
     onGenerateClicked: () -> Unit,
     onSaveQuizClicked: () -> Unit,
@@ -358,6 +382,7 @@ private fun CreateQuizContent(
     // Localized theme list: English by default, French if phone is French
     val themeList = listOf(
         AiQuizUiState.THEME_ALL to stringResource(R.string.ai_theme_all),
+        AiQuizUiState.THEME_CUSTOM to stringResource(R.string.ai_theme_custom),
         "oceans" to stringResource(R.string.ai_theme_oceans),
         "animaux" to stringResource(R.string.ai_theme_animals),
         "energies" to stringResource(R.string.ai_theme_energy),
@@ -404,6 +429,63 @@ private fun CreateQuizContent(
                 }
             }
 
+            // Custom Search Input Box when "Custom" theme is selected
+            if (uiState.selectedThemeTag.equals(AiQuizUiState.THEME_CUSTOM, ignoreCase = true)) {
+                item {
+                    CustomSearchCard(
+                        query = uiState.customSearchQuery,
+                        onQueryChange = onCustomQueryChange,
+                        onSearch = onPerformCustomSearch
+                    )
+                }
+            }
+
+            // Differentiated error banner for quiz generation errors
+            if (uiState.generationErrorSource != null || uiState.errorMessage != null) {
+                item {
+                    val (icon, titleRes, descRes) = when (uiState.generationErrorSource) {
+                        AiQuizErrorSource.NO_INTERNET -> Triple("📡", R.string.error_no_internet_title, R.string.error_no_internet_desc)
+                        AiQuizErrorSource.AI_SERVICE -> Triple("🤖", R.string.error_ai_service_title, R.string.error_ai_service_desc)
+                        AiQuizErrorSource.SEARCH_SERVICE -> Triple("🔍", R.string.error_search_service_title, R.string.error_search_service_desc)
+                        else -> Triple("⚠️", R.string.error_general_title, R.string.error_general_desc)
+                    }
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xD0780000)),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .border(1.dp, Color(0x66FF6B6B), RoundedCornerShape(16.dp))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = icon, fontSize = 28.sp)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(titleRes),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = stringResource(descRes),
+                                    color = Color(0xFFFFD1D1),
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             // Loading state indicator
             if (uiState.isSearchingArticles) {
                 item {
@@ -421,6 +503,94 @@ private fun CreateQuizContent(
                             color = Color.White,
                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp)
                         )
+                    }
+                }
+            }
+
+            // No preload / fallback: If search returned nothing or offline, show clear generic error message with Retry button
+            if (displayedArticles.isEmpty() && !uiState.isSearchingArticles) {
+                val isBlankCustom = uiState.selectedThemeTag.equals(AiQuizUiState.THEME_CUSTOM, ignoreCase = true) &&
+                        uiState.customSearchQuery.isBlank()
+
+                if (isBlankCustom) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = CardBackground),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ai_custom_empty_hint),
+                                color = Color(0xFFD8F3DC),
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+                } else {
+                    item {
+                        val (icon, titleRes, descRes) = when (uiState.searchErrorSource) {
+                            AiQuizErrorSource.NO_INTERNET -> Triple("📡", R.string.error_no_internet_title, R.string.error_no_internet_desc)
+                            AiQuizErrorSource.SEARCH_SERVICE -> Triple("🔍", R.string.error_search_service_title, R.string.error_search_service_desc)
+                            AiQuizErrorSource.AI_SERVICE -> Triple("🤖", R.string.error_ai_service_title, R.string.error_ai_service_desc)
+                            else -> Triple("⚠️", R.string.error_search_service_title, R.string.ai_articles_error_generic)
+                        }
+
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = CardBackground),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp)
+                                .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(16.dp))
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = icon,
+                                    fontSize = 32.sp
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stringResource(titleRes),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(descRes),
+                                    color = Color(0xFFD8F3DC),
+                                    fontSize = 13.sp,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 18.sp
+                                )
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Button(
+                                    onClick = onRetryLoadArticles,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Orange),
+                                    shape = CircleShape,
+                                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.ai_articles_retry),
+                                        color = Color.White,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -744,7 +914,7 @@ private fun AiPaywallDialog(
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = stringResource(R.string.paywall_subtitle, Const.MAX_FREE_AI_QUIZ_TRIES),
+                    text = stringResource(R.string.paywall_subtitle, priceText),
                     color = Color.White,
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center
@@ -755,6 +925,12 @@ private fun AiPaywallDialog(
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Text(
+                        text = stringResource(R.string.paywall_feature_trial),
+                        color = GoldBadge,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                     Text(
                         text = stringResource(R.string.paywall_feature_1),
                         color = Color(0xFFD8F3DC),
@@ -820,6 +996,98 @@ private fun AiPaywallDialog(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CustomSearchCard(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .border(1.dp, if (query.isNotBlank()) Orange else Color(0x44FFFFFF), RoundedCornerShape(16.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.ai_custom_search_hint),
+                        color = Color(0x99FFFFFF),
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    cursorColor = Orange
+                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = {
+                    keyboardController?.hide()
+                    if (query.isNotBlank()) {
+                        onSearch(query.trim())
+                    }
+                }),
+                modifier = Modifier.weight(1f)
+            )
+
+            if (query.isNotBlank()) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color(0x33FFFFFF))
+                        .clickable { onQueryChange("") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("✕", color = Color.White, fontSize = 12.sp)
+                }
+                Spacer(modifier = Modifier.width(6.dp))
+            }
+
+            Button(
+                onClick = {
+                    keyboardController?.hide()
+                    if (query.isNotBlank()) {
+                        onSearch(query.trim())
+                    }
+                },
+                enabled = query.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Orange,
+                    disabledContainerColor = Color(0x44FFA500)
+                ),
+                shape = CircleShape,
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.ai_custom_search_button),
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

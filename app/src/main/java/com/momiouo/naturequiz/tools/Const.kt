@@ -13,4 +13,6 @@ object Const {
     const val AI_QUIZ_DB_THEME = "ai_quiz"
     const val MAX_FREE_AI_QUIZ_TRIES = 3
     const val SUBSCRIPTION_PRODUCT_ID = "nature_quiz_ai_monthly"
+    const val SUBSCRIPTION_BASE_PLAN_ID = "monthly-plan"
+    const val SUBSCRIPTION_OFFER_ID = "free-trial-7-days"
 }

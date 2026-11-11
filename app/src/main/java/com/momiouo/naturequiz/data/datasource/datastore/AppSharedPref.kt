@@ -31,17 +31,43 @@ class AppSharedPref @Inject constructor(
     fun getSharedPrefCounter() =
         pref.getInt("counter", 0)
 
-    fun getAiFreeTriesUsed(): Int =
-        pref.getInt(KEY_AI_FREE_TRIES_USED, 0)
+    /**
+     * Checks if 24 hours have elapsed since the last daily reset.
+     * If so, resets the free quiz generations counter to 0.
+     */
+    private fun checkAndResetDailyTries() {
+        val lastResetTime = pref.getLong(KEY_AI_FREE_TRIES_LAST_RESET_TIME, 0L)
+        val now = System.currentTimeMillis()
+        val twentyFourHoursMs = 24 * 60 * 60 * 1000L
+
+        if (lastResetTime == 0L) {
+            // First time tracking: initialize the timestamp
+            editor.putLong(KEY_AI_FREE_TRIES_LAST_RESET_TIME, now)
+            editor.commit()
+        } else if (now - lastResetTime >= twentyFourHoursMs) {
+            // 24 hours elapsed: reset used tries to 0 and record new cycle
+            editor.putInt(KEY_AI_FREE_TRIES_USED, 0)
+            editor.putLong(KEY_AI_FREE_TRIES_LAST_RESET_TIME, now)
+            editor.commit()
+        }
+    }
+
+    fun getAiFreeTriesUsed(): Int {
+        checkAndResetDailyTries()
+        return pref.getInt(KEY_AI_FREE_TRIES_USED, 0)
+    }
 
     fun incrementAiFreeTriesUsed() {
-        val used = getAiFreeTriesUsed()
+        checkAndResetDailyTries()
+        val used = pref.getInt(KEY_AI_FREE_TRIES_USED, 0)
         editor.putInt(KEY_AI_FREE_TRIES_USED, used + 1)
         editor.commit()
     }
 
-    fun getRemainingAiFreeTries(): Int =
-        (Const.MAX_FREE_AI_QUIZ_TRIES - getAiFreeTriesUsed()).coerceAtLeast(0)
+    fun getRemainingAiFreeTries(): Int {
+        checkAndResetDailyTries()
+        return (Const.MAX_FREE_AI_QUIZ_TRIES - pref.getInt(KEY_AI_FREE_TRIES_USED, 0)).coerceAtLeast(0)
+    }
 
     fun isAiProSubscribed(): Boolean =
         pref.getBoolean(KEY_AI_PRO_SUBSCRIBED, false)
@@ -64,7 +90,10 @@ class AppSharedPref @Inject constructor(
                         title = obj.optString("title", "AI Quiz #${i + 1}"),
                         sourcesSummary = obj.optString("sourcesSummary", "Futura Sciences"),
                         createdAt = obj.optString("createdAt", ""),
-                        questionCount = obj.optInt("questionCount", 5)
+                        questionCount = obj.optInt("questionCount", 5),
+                        articleTitle = obj.optString("articleTitle", ""),
+                        articleUrl = obj.optString("articleUrl", ""),
+                        articleImageUrl = obj.optString("articleImageUrl", "")
                     )
                 )
             }
@@ -72,6 +101,10 @@ class AppSharedPref @Inject constructor(
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun getSavedAiQuizByLevel(levelId: Int): SavedAiQuiz? {
+        return getSavedAiQuizzes().firstOrNull { it.levelId == levelId }
     }
 
     fun addSavedAiQuiz(quiz: SavedAiQuiz) {
@@ -94,6 +127,9 @@ class AppSharedPref @Inject constructor(
                 put("sourcesSummary", item.sourcesSummary)
                 put("createdAt", item.createdAt)
                 put("questionCount", item.questionCount)
+                put("articleTitle", item.articleTitle)
+                put("articleUrl", item.articleUrl)
+                put("articleImageUrl", item.articleImageUrl)
             }
             array.put(obj)
         }
@@ -103,6 +139,7 @@ class AppSharedPref @Inject constructor(
 
     companion object {
         private const val KEY_AI_FREE_TRIES_USED = "ai_free_tries_used"
+        private const val KEY_AI_FREE_TRIES_LAST_RESET_TIME = "ai_free_tries_last_reset_time"
         private const val KEY_AI_PRO_SUBSCRIBED = "ai_pro_subscribed"
         private const val KEY_SAVED_AI_QUIZZES = "saved_ai_quizzes_json"
     }

@@ -27,6 +27,7 @@ interface QuestionRepository {
 
     suspend fun saveGeneratedAiQuizLocally(quiz: GeneratedAiQuiz): SavedAiQuiz
     fun getSavedAiQuizzes(): List<SavedAiQuiz>
+    fun getSavedAiQuizByLevel(levelId: Int): SavedAiQuiz?
     suspend fun deleteSavedAiQuiz(levelId: Int)
     fun getRemainingAiFreeTries(): Int
     fun incrementAiFreeTriesUsed()

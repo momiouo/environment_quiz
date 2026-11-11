@@ -90,18 +90,53 @@ class BillingManager @Inject constructor(
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 val details = productDetailsList.firstOrNull()
                 subscriptionProductDetails = details
-                val price = details
-                    ?.subscriptionOfferDetails
-                    ?.firstOrNull()
-                    ?.pricingPhases
-                    ?.pricingPhaseList
-                    ?.firstOrNull()
-                    ?.formattedPrice
+                val bestOffer = getBestSubscriptionOffer(details)
+                val recurringPhase = bestOffer?.pricingPhases?.pricingPhaseList?.firstOrNull { it.priceAmountMicros > 0 }
+                    ?: bestOffer?.pricingPhases?.pricingPhaseList?.firstOrNull()
+                val price = recurringPhase?.formattedPrice
                 if (price != null) {
                     _formattedPrice.value = price
                 }
+            } else if (BuildConfig.DEBUG) {
+                Log.d(TAG, "queryProductDetailsAsync finished with code: ${billingResult.responseCode} (${billingResult.debugMessage})")
             }
         }
+    }
+
+    private fun getBestSubscriptionOffer(details: ProductDetails?): ProductDetails.SubscriptionOfferDetails? {
+        val offers = details?.subscriptionOfferDetails ?: return null
+
+        // 1. Filter by basePlanId matching Const.SUBSCRIPTION_BASE_PLAN_ID or common names
+        val matchingBasePlanOffers = offers.filter {
+            it.basePlanId.equals(Const.SUBSCRIPTION_BASE_PLAN_ID, ignoreCase = true) ||
+                it.basePlanId.equals("monthly", ignoreCase = true) ||
+                it.basePlanId.equals("monthly-plan", ignoreCase = true)
+        }.ifEmpty { offers }
+
+        // 2. Direct match by configured offerId (e.g. "free-trial-7-days")
+        val exactOfferMatch = matchingBasePlanOffers.firstOrNull { offer ->
+            val offerId = offer.offerId
+            offerId != null && (
+                offerId.equals(Const.SUBSCRIPTION_OFFER_ID, ignoreCase = true) ||
+                    offerId.equals("free-trial-7-days", ignoreCase = true) ||
+                    offerId.equals("free-trial-7d", ignoreCase = true) ||
+                    offerId.equals("trial-7-days", ignoreCase = true) ||
+                    offerId.equals("trial-7d", ignoreCase = true) ||
+                    offerId.contains("trial", ignoreCase = true)
+            )
+        }
+        if (exactOfferMatch != null) {
+            return exactOfferMatch
+        }
+
+        // 3. Prioritize offer that includes a 7-day free trial (phase with priceAmountMicros == 0)
+        val freeTrialOffer = matchingBasePlanOffers.firstOrNull { offer ->
+            offer.pricingPhases.pricingPhaseList.any { phase ->
+                phase.priceAmountMicros == 0L
+            }
+        }
+
+        return freeTrialOffer ?: matchingBasePlanOffers.firstOrNull() ?: offers.firstOrNull()
     }
 
     fun queryActiveSubscriptions() {
@@ -133,7 +168,8 @@ class BillingManager @Inject constructor(
         onStoreProductNotReady: () -> Unit
     ) {
         val details = subscriptionProductDetails
-        val offerToken = details?.subscriptionOfferDetails?.firstOrNull()?.offerToken
+        val bestOffer = getBestSubscriptionOffer(details)
+        val offerToken = bestOffer?.offerToken
 
         if (activity != null && billingClient.isReady && details != null && offerToken != null) {
             val productDetailsParamsList = listOf(
@@ -145,7 +181,13 @@ class BillingManager @Inject constructor(
             val billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(productDetailsParamsList)
                 .build()
-            billingClient.launchBillingFlow(activity, billingFlowParams)
+            val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
+            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "launchBillingFlow returned: ${billingResult.responseCode} (${billingResult.debugMessage})")
+                }
+                onStoreProductNotReady()
+            }
         } else {
             startBillingConnection()
             onStoreProductNotReady()

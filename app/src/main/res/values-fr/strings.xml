@@ -48,13 +48,14 @@
     <string name="ai_limit_reached_desc">Vous avez utilisé vos essais gratuits. Abonnez-vous pour débloquer la génération illimitée !</string>
     <string name="ai_limit_reached_header">✨ Limite Atteinte ✨</string>
     <string name="ai_limit_reached_tries">Tu as utilisé tes 3 quiz gratuits !</string>
-    <string name="ai_limit_reached_message">Abonne-toi pour créer des quiz à volonté à partir des actualités scientifiques de Futura Sciences, Nature, NASA et nos sources fiables !</string>
-    <string name="ai_subscribe_monthly_format">S\'abonner (%1$s/mois)</string>
+    <string name="ai_limit_reached_message">Abonne-toi pour créer des quiz à volonté à partir des actualités scientifiques de Futura Sciences, Nature, NASA et nos sources fiables ! Profite de 7 jours d\'essai gratuit, annulable à tout moment.</string>
+    <string name="ai_subscribe_monthly_format">Essai 7 jours gratuit (%1$s/mois)</string>
     <string name="ai_loading_articles">Chargement des derniers articles…</string>
     <string name="ai_subscribe_now">Débloquer l\'illimité</string>
     <string name="ai_api_key_note">Astuce : Ajoutez GEMINI_API_KEY dans local.properties pour la recherche Google en direct.</string>
 
     <string name="ai_theme_all">Tous</string>
+    <string name="ai_theme_custom">🔎 Personnalisé</string>
     <string name="ai_theme_oceans">🌊 Océans</string>
     <string name="ai_theme_animals">🐾 Animaux</string>
     <string name="ai_theme_energy">⚡ Énergies</string>
@@ -63,13 +64,38 @@
     <string name="ai_theme_space">🛰️ Espace</string>
     <string name="ai_theme_waste">♻️ Déchets</string>
 
+    <string name="ai_custom_search_hint">Tapez un sujet (ex : volcans, loups, solaire…)</string>
+    <string name="ai_custom_search_button">Chercher</string>
+    <string name="ai_custom_empty_hint">Tapez un sujet ci-dessus pour rechercher des articles récents et créer votre quiz !</string>
+    <string name="ai_articles_error_generic">Impossible de charger les articles. Vérifiez votre connexion Internet et réessayez.</string>
+    <string name="ai_articles_retry">Réessayer</string>
+
+    <string name="error_no_internet_title">Pas de connexion Internet</string>
+    <string name="error_no_internet_desc">Veuillez vérifier votre connexion Wi-Fi ou vos données mobiles et réessayer.</string>
+    <string name="error_search_service_title">Recherche indisponible</string>
+    <string name="error_search_service_desc">Impossible de récupérer les articles scientifiques récents. Réessayez dans un instant ou modifiez vos mots-clés.</string>
+    <string name="error_ai_service_title">Service IA surchargé</string>
+    <string name="error_ai_service_desc">Le service Google Gemini est temporairement indisponible ou surchargé. Merci de réessayer dans quelques instants.</string>
+    <string name="error_general_title">Erreur de génération</string>
+    <string name="error_general_desc">Une erreur inattendue est survenue lors de la création du quiz. Veuillez réessayer.</string>
+
+    <string name="billing_not_ready_message">Connexion au Google Play Store. Veuillez réessayer dans un instant.</string>
+
+    <string name="end_source_article_title">Article d\'Origine</string>
+    <string name="end_read_article">Lire l\'article ↗</string>
+    <string name="end_share_button">🌟 Partager mon score</string>
+    <string name="end_share_chooser_title">Partager votre score via…</string>
+    <string name="end_share_picker_message">J\'ai fait un score de %1$d%% au quiz « %2$s » sur Environment Quiz ! 🌿 Viens tester l\'application ici : %3$s | Article : %4$s</string>
+    <string name="end_share_picker_message_general">J\'ai fait un score de %1$d%% sur Environment Quiz ! 🌿 Viens tester tes connaissances ici : %2$s</string>
+
     <string name="paywall_title">Quiz IA Illimités ✨</string>
-    <string name="paywall_subtitle">Vous avez utilisé vos %1$d générations de quiz IA gratuites !</string>
+    <string name="paywall_subtitle">Profitez de 7 jours d\'essai gratuit, puis %1$s/mois sans engagement !</string>
+    <string name="paywall_feature_trial">🎁 7 jours d\'essai 100% gratuit</string>
     <string name="paywall_feature_1">✓ Quiz IA illimités depuis Futura Sciences, Nature, NASA et Les Horizons</string>
     <string name="paywall_feature_2">✓ Choisissez vos articles récents ou sujets écologiques</string>
     <string name="paywall_feature_3">✓ Sauvegardez tous vos quiz en local pour jouer hors-ligne</string>
-    <string name="paywall_subscribe_button">S\'abonner (%1$s/mois)</string>
-    <string name="paywall_default_price">4,99 €</string>
+    <string name="paywall_subscribe_button">Commencer l\'essai gratuit 7j (%1$s/mois)</string>
+    <string name="paywall_default_price">0,99 €</string>
     <string name="paywall_restore_button">Restaurer l\'abonnement</string>
     <string name="paywall_close_button">Plus tard</string>
     <string name="paywall_debug_unlock">Activer l\'abonnement test (Debug)</string>
