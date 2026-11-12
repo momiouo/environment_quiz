@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.momiouo.naturequiz.data.analytics.AnalyticsTracker
 import com.momiouo.naturequiz.domain.repository.QuestionRepository
 import com.momiouo.naturequiz.domain.usecase.GetGoodAnswerCounterUseCase
 import com.momiouo.naturequiz.domain.usecase.GetQuestionNumberThemeLevelUseCase
@@ -25,7 +26,8 @@ class EndViewModel @Inject constructor(
     getQuestionNumberThemeLevelUseCase: GetQuestionNumberThemeLevelUseCase,
     getGoodAnswerCounterUseCase: GetGoodAnswerCounterUseCase,
     private val resetIsGoodAnswerCounterUseCase: ResetIsGoodAnswerCounterUseCase,
-    private val repository: QuestionRepository
+    private val repository: QuestionRepository,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     private val selectedThemeId: StateFlow<String> = savedStateHandle.getStateFlow("themeId", "")
@@ -49,12 +51,22 @@ class EndViewModel @Inject constructor(
                 val isAiQuiz = selectedThemeId.value == Const.AI_QUIZ_DB_THEME
                 val levelInt = selectedLevelId.value.toIntOrNull() ?: 0
                 val savedAiQuiz = if (isAiQuiz) repository.getSavedAiQuizByLevel(levelInt) else null
+                val articleTitle = savedAiQuiz?.articleTitle?.ifBlank { savedAiQuiz.title } ?: ""
+
+                if (isAiQuiz) {
+                    analyticsTracker.logQuizCompleted(
+                        scorePercentage = score,
+                        goodAnswers = goodAnswerNumber,
+                        totalQuestions = questionNumber,
+                        articleTitle = articleTitle
+                    )
+                }
 
                 EndUiState.Loaded(
                     score = score,
                     text = text,
                     isAiQuiz = isAiQuiz,
-                    articleTitle = savedAiQuiz?.articleTitle?.ifBlank { savedAiQuiz.title } ?: "",
+                    articleTitle = articleTitle,
                     articleUrl = savedAiQuiz?.articleUrl ?: "",
                     articleImageUrl = savedAiQuiz?.articleImageUrl ?: "",
                     sourceName = savedAiQuiz?.sourcesSummary?.ifBlank { "Futura Sciences" } ?: "",
@@ -66,6 +78,14 @@ class EndViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = EndUiState.Loading,
             )
+
+    fun logScoreShared(score: Int, articleTitle: String) {
+        analyticsTracker.logScoreShared(score, articleTitle)
+    }
+
+    fun logArticleOpened(articleTitle: String, articleUrl: String) {
+        analyticsTracker.logArticleOpened(articleTitle, articleUrl)
+    }
 
     fun resetIsGoodAnswerCounter() =
         viewModelScope.launch(Dispatchers.IO) { resetIsGoodAnswerCounterUseCase.invoke() }

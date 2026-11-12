@@ -14,6 +14,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.momiouo.naturequiz.data.analytics.AnalyticsTracker
 import com.momiouo.naturequiz.data.datasource.datastore.AppSharedPref
 import com.momiouo.naturequiz.tools.Const
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +28,8 @@ import javax.inject.Singleton
 @Singleton
 class BillingManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val appSharedPref: AppSharedPref
+    private val appSharedPref: AppSharedPref,
+    private val analyticsTracker: AnalyticsTracker
 ) : PurchasesUpdatedListener {
 
     private val _isSubscribed = MutableStateFlow(appSharedPref.isAiProSubscribed())
@@ -223,8 +225,12 @@ class BillingManager @Inject constructor(
     }
 
     fun setSubscribedState(subscribed: Boolean) {
+        val previous = _isSubscribed.value
         appSharedPref.setAiProSubscribed(subscribed)
         _isSubscribed.value = subscribed
+        if (previous != subscribed) {
+            analyticsTracker.logSubscriptionStatusChanged(subscribed)
+        }
     }
 
     companion object {

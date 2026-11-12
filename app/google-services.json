@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "561420147929",
+    "firebase_url": "https://environment-quiz-87403518-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "environment-quiz-87403518",
+    "storage_bucket": "environment-quiz-87403518.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561420147929:android:676b044bc9710308a672c8",
+        "android_client_info": {
+          "package_name": "fr.momiouo.naturequiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561420147929-5v2j1navbnu2fspaj7iegqm0s1rkmvcc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2QdrX8ZbtFCqkZ-rJPdbukZOko47O-MU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561420147929-5v2j1navbnu2fspaj7iegqm0s1rkmvcc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561420147929:android:9a290639da741f86a672c8",
+        "android_client_info": {
+          "package_name": "fr.momiouo.naturequizpro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561420147929-5v2j1navbnu2fspaj7iegqm0s1rkmvcc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2QdrX8ZbtFCqkZ-rJPdbukZOko47O-MU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561420147929-5v2j1navbnu2fspaj7iegqm0s1rkmvcc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

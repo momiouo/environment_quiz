@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.momiouo.naturequiz.data.analytics.AnalyticsTracker
 import com.momiouo.naturequiz.data.billing.BillingManager
 import com.momiouo.naturequiz.domain.model.AiQuizErrorSource
 import com.momiouo.naturequiz.domain.model.AiQuizException
@@ -55,7 +56,8 @@ data class AiQuizUiState(
 class AiQuizViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: QuestionRepository,
-    private val billingManager: BillingManager
+    private val billingManager: BillingManager,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -88,6 +90,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun selectTheme(themeTag: String) {
+        analyticsTracker.logThemeSelected(themeTag)
         if (_uiState.value.selectedThemeTag.equals(themeTag, ignoreCase = true) && _uiState.value.articles.isNotEmpty()) {
             return
         }
@@ -120,6 +123,7 @@ class AiQuizViewModel @Inject constructor(
     fun searchCustomArticles(query: String) {
         val trimmed = query.trim()
         if (trimmed.isBlank()) return
+        analyticsTracker.logCustomSearch(trimmed)
         _uiState.update {
             it.copy(
                 selectedThemeTag = AiQuizUiState.THEME_CUSTOM,
@@ -158,6 +162,11 @@ class AiQuizViewModel @Inject constructor(
                     topicQuery = themeTag,
                     selectedSources = emptyList(),
                     language = language
+                )
+                analyticsTracker.logArticlesLoaded(
+                    theme = themeTag,
+                    count = foundArticles.size,
+                    isCustom = _uiState.value.selectedThemeTag.equals(AiQuizUiState.THEME_CUSTOM, ignoreCase = true)
                 )
                 _uiState.update {
                     it.copy(
@@ -214,6 +223,7 @@ class AiQuizViewModel @Inject constructor(
         val chosenArticles = state.articles.filter { state.selectedArticleIds.contains(it.id) }
         if (chosenArticles.isEmpty()) return
 
+        analyticsTracker.logQuizGenerationStarted(state.selectedThemeTag, chosenArticles.size)
         val language = Locale.current.language
         _uiState.update {
             it.copy(
@@ -274,6 +284,7 @@ class AiQuizViewModel @Inject constructor(
     fun saveAndPlayCurrentQuiz(onNavigateToQuiz: (theme: String, level: String) -> Unit) {
         val quiz = _uiState.value.generatedQuiz ?: return
         val existingLevelId = _uiState.value.savedQuizLevelId
+        analyticsTracker.logQuizPlayed(quiz.title, quiz.questions.size)
 
         viewModelScope.launch {
             val targetLevelId = withContext(Dispatchers.IO) {
@@ -297,6 +308,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun playSavedQuiz(levelId: Int, onNavigateToQuiz: (theme: String, level: String) -> Unit) {
+        analyticsTracker.logQuizPlayed("saved_quiz_$levelId", 5)
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.resetIsGoodAnswerCounter()
@@ -319,6 +331,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun openPaywall() {
+        analyticsTracker.logPaywallViewed("manual_click", repository.getRemainingAiFreeTries())
         _uiState.update { it.copy(showPaywallDialog = true) }
     }
 
@@ -327,6 +340,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun subscribeMonthly(activity: Activity?, onNotReady: (() -> Unit)? = null) {
+        analyticsTracker.logPaywallSubscribeClicked("paywall", formattedPrice.value)
         billingManager.launchSubscriptionFlow(
             activity = activity,
             onStoreProductNotReady = {
@@ -336,6 +350,7 @@ class AiQuizViewModel @Inject constructor(
     }
 
     fun restoreSubscription() {
+        analyticsTracker.logSubscriptionRestored(isSubscribed.value)
         billingManager.queryActiveSubscriptions()
     }
 

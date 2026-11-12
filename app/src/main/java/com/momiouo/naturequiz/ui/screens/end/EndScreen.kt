@@ -100,7 +100,9 @@ fun EndScreen(
                 level = level,
                 endState = endState,
                 navigateToMenuScreen = navigateToMenuScreen,
-                navigateToQuestionScreen = navigateToQuestionScreen
+                navigateToQuestionScreen = navigateToQuestionScreen,
+                onScoreShared = { endViewModel.logScoreShared(endState.score, endState.articleTitle) },
+                onArticleOpened = { endViewModel.logArticleOpened(endState.articleTitle, endState.articleUrl) }
             )
             EndUiState.Loading -> Box(
                 modifier = Modifier.fillMaxSize(),
@@ -118,7 +120,9 @@ fun EndScreenContent(
     level: String,
     endState: EndUiState.Loaded,
     navigateToMenuScreen: () -> Unit,
-    navigateToQuestionScreen: (theme: String, level: String) -> Unit
+    navigateToQuestionScreen: (theme: String, level: String) -> Unit,
+    onScoreShared: () -> Unit = {},
+    onArticleOpened: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -223,6 +227,7 @@ fun EndScreenContent(
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                         context.startActivity(shareChooser)
+                        onScoreShared()
                     } catch (e: Exception) {
                         Log.e("EndScreen", "Error launching share picker", e)
                     }
@@ -314,6 +319,7 @@ fun EndScreenContent(
                                         .clip(CircleShape)
                                         .background(Color(0x33FFFFFF))
                                         .clickable {
+                                            onArticleOpened()
                                             openArticleUrl(
                                                 context,
                                                 endState.articleUrl,

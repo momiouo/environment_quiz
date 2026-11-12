@@ -2,6 +2,7 @@ package com.momiouo.naturequiz.data.datasource.remote
 
 import android.content.Context
 import android.util.Log
+import com.momiouo.naturequiz.data.analytics.AnalyticsTracker
 import com.momiouo.naturequiz.domain.model.AiQuizErrorSource
 import com.momiouo.naturequiz.domain.model.AiQuizException
 import com.momiouo.naturequiz.domain.model.ArticleItem
@@ -30,7 +31,8 @@ import javax.inject.Singleton
 @Singleton
 class GeminiAiDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val serpApiDataSource: SerpApiDataSource
+    private val serpApiDataSource: SerpApiDataSource,
+    private val analyticsTracker: AnalyticsTracker
 ) {
 
     private val apiKey: String
@@ -111,26 +113,56 @@ class GeminiAiDataSource @Inject constructor(
             return@withContext cached
         }
 
+        val startTime = System.currentTimeMillis()
         if (apiKey.isNotEmpty() && articles.isNotEmpty()) {
             try {
                 val prompt = buildQuizGenerationPrompt(articles, isFrench)
                 val responseJson = callGeminiForQuiz(prompt)
                 val parsedQuiz = parseQuizFromGeminiResponse(responseJson, articles, isFrench)
+                val durationMs = System.currentTimeMillis() - startTime
                 if (parsedQuiz != null && parsedQuiz.questions.isNotEmpty()) {
                     quizCache[cacheKey] = parsedQuiz
+                    analyticsTracker.logQuizGenerationSuccess(
+                        quizTitle = parsedQuiz.title,
+                        questionsCount = parsedQuiz.questions.size,
+                        durationMs = durationMs,
+                        modelName = "gemini-flash"
+                    )
                     return@withContext parsedQuiz
                 } else {
-                    throw AiQuizException(AiQuizErrorSource.AI_SERVICE, "Could not parse questions from AI response")
+                    val ex = AiQuizException(AiQuizErrorSource.AI_SERVICE, "Could not parse questions from AI response")
+                    analyticsTracker.logQuizGenerationFailed(
+                        errorSource = AiQuizErrorSource.AI_SERVICE.name,
+                        errorMessage = ex.message,
+                        durationMs = durationMs,
+                        throwable = ex
+                    )
+                    throw ex
                 }
             } catch (e: Exception) {
+                val durationMs = System.currentTimeMillis() - startTime
                 if (e is UnknownHostException || e is ConnectException || e is SocketTimeoutException || !context.isNetworkAvailable()) {
-                    throw AiQuizException(AiQuizErrorSource.NO_INTERNET, e.message, e)
+                    val netEx = AiQuizException(AiQuizErrorSource.NO_INTERNET, e.message, e)
+                    analyticsTracker.logQuizGenerationFailed(
+                        errorSource = AiQuizErrorSource.NO_INTERNET.name,
+                        errorMessage = netEx.message,
+                        durationMs = durationMs,
+                        throwable = netEx
+                    )
+                    throw netEx
                 }
                 if (e is AiQuizException) throw e
                 if (BuildConfig.DEBUG) {
                     Log.e(TAG, "Gemini generateQuizFromArticles failed", e)
                 }
-                throw AiQuizException(AiQuizErrorSource.AI_SERVICE, e.message, e)
+                val aiEx = AiQuizException(AiQuizErrorSource.AI_SERVICE, e.message, e)
+                analyticsTracker.logQuizGenerationFailed(
+                    errorSource = AiQuizErrorSource.AI_SERVICE.name,
+                    errorMessage = aiEx.message,
+                    durationMs = durationMs,
+                    throwable = aiEx
+                )
+                throw aiEx
             }
         }
 
