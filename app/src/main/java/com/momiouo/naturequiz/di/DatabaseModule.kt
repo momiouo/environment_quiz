@@ -22,5 +22,8 @@ internal object DatabaseModule {
         context,
         AppDatabase::class.java,
         "my_database",
-    ).addCallback(MyDatabaseCallback).build()
+    )
+        .fallbackToDestructiveMigration()
+        .addCallback(MyDatabaseCallback)
+        .build()
 }

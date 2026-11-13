@@ -30,8 +30,8 @@ android {
         applicationId = "fr.momiouo.naturequiz"
         minSdk = 29
         targetSdk = 36
-        versionCode = 106
-        versionName = "1.1"
+        versionCode = 108
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

@@ -19,16 +19,30 @@ import javax.inject.Singleton
 @Singleton
 class SerpApiDataSource @Inject constructor() {
 
+    // Single SerpApi key for now
     private val apiKey: String = BuildConfig.SERPAPI_API_KEY.trim()
+
+    /*
+     * MULTI-KEY ROTATION (Commentée pour l'instant)
+     * Pour activer la rotation avec plusieurs comptes gratuits SerpApi (ex: key1,key2,key3) :
+     * Décommentez ces lignes et utilisez querySerpApiWithFailover ci-dessous.
+     *
+     * private val apiKeys: List<String> = BuildConfig.SERPAPI_API_KEY
+     *     .split(",")
+     *     .map { it.trim() }
+     *     .filter { it.isNotEmpty() }
+     * private val exhaustedKeys = ConcurrentHashMap.newKeySet<String>()
+     * private fun getAvailableApiKey(): String? = apiKeys.firstOrNull { !exhaustedKeys.contains(it) }
+     */
 
     private data class CachedSearch(
         val articles: List<ArticleItem>,
         val timestamp: Long
     )
 
-    // In-memory cache to eliminate redundant SerpApi requests and minimize costs
+    // In-memory cache to eliminate redundant SerpApi requests and minimize costs (12 hours TTL)
     private val searchCache = ConcurrentHashMap<String, CachedSearch>()
-    private val CACHE_TTL_MS = 60 * 60 * 1000L // 1 hour TTL
+    private val CACHE_TTL_MS = 12 * 60 * 60 * 1000L // 12 hours TTL
 
     fun isConfigured(): Boolean = apiKey.isNotEmpty()
 
@@ -127,6 +141,12 @@ class SerpApiDataSource @Inject constructor() {
         val root = JSONObject(responseText)
         return parseSerpApiResponse(root, themeTag, isFrench)
     }
+
+    /*
+     * querySerpApiWithFailover (Commentée pour rotation multi-clés si réactivée) :
+     *
+     * private fun querySerpApiWithFailover(...) { ... }
+     */
 
     private fun parseSerpApiResponse(
         root: JSONObject,
